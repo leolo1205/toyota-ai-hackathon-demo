@@ -2,30 +2,27 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="description" content="透明時刻 Clear Moment：2026 和泰 AI 黑客松提案互動 Demo（非官方示意）">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="透明時刻 Clear Moment：2026 和泰 AI 黑客松提案互動 Demo（非官方示意）。">
 <title>透明時刻 Demo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap">
 <style>
-/* Layout：簡報演示模式。上方場景控制與說明列（對應簡報頁碼），下方左為服務廠平板、右為車主手機。
-   裝置畫面固定淺色模擬實際系統；紫色＝本提案新增的 AI 功能，聚焦模式下其餘現行介面變淡。 */
+/* Layout：上方導覽列＋步驟說明卡（含操作按鈕），下方左為服務廠平板、右為車主手機。
+   窄螢幕一次只顯示一台裝置並自動切換，操作按鈕固定在底部。紫色＝本提案新增的 AI 功能。 */
 :root{
-  --bg:#eceef2; --fg:#16181d; --muted:#5b616d; --panel:#ffffff; --panel-2:#e2e5ea; --line:#d3d7de;
-  --prop:#6a3fd1; --prop-soft:#eee7ff; --prop-ink:#4b2aa3; --accent:#d6001c;
-  --ok:#1b7f45; --ok-soft:#e1f3e8; --warn:#9a5c00; --warn-soft:#fff1d6;
+  --bg:#eef0f4; --fg:#15171c; --muted:#5a606c; --panel:#ffffff; --panel-2:#e3e6ec; --line:#d3d7df;
+  --prop:#6a3fd1; --prop-soft:#efe8ff; --prop-ink:#4a28a3; --ok:#1b7f45; --ok-soft:#e2f4e9; --accent:#d6001c;
   --font:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#101216; --fg:#eceef2; --muted:#9ba2ae; --panel:#1a1d23; --panel-2:#262a33; --line:#353a46;
-  --prop:#a98bff; --prop-soft:#2a2142; --prop-ink:#cdbcff; --accent:#ff4a5f;
-  --ok:#52c585; --ok-soft:#14301f; --warn:#f0aa3c; --warn-soft:#3a2b12; color-scheme:dark;
+  --bg:#0f1115; --fg:#eceef2; --muted:#a0a7b3; --panel:#1a1d23; --panel-2:#272b34; --line:#353a46;
+  --prop:#a98bff; --prop-soft:#2a2142; --prop-ink:#d3c4ff; --ok:#58c98a; --ok-soft:#14301f; --accent:#ff4a5f; color-scheme:dark;
 }}
 :root[data-theme="dark"]{
-  --bg:#101216; --fg:#eceef2; --muted:#9ba2ae; --panel:#1a1d23; --panel-2:#262a33; --line:#353a46;
-  --prop:#a98bff; --prop-soft:#2a2142; --prop-ink:#cdbcff; --accent:#ff4a5f;
-  --ok:#52c585; --ok-soft:#14301f; --warn:#f0aa3c; --warn-soft:#3a2b12; color-scheme:dark;
+  --bg:#0f1115; --fg:#eceef2; --muted:#a0a7b3; --panel:#1a1d23; --panel-2:#272b34; --line:#353a46;
+  --prop:#a98bff; --prop-soft:#2a2142; --prop-ink:#d3c4ff; --ok:#58c98a; --ok-soft:#14301f; --accent:#ff4a5f; color-scheme:dark;
 }
 *{box-sizing:border-box}
 html,body{height:100%}
@@ -34,92 +31,148 @@ button{font:inherit;cursor:pointer;color:inherit}
 button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--prop);outline-offset:2px}
 h1,h2,h3,h4{margin:0;text-wrap:balance}
 p{margin:0}
-.shell{height:100%;display:flex;flex-direction:column;gap:8px;padding:10px 16px 8px}
-@media (min-width:981px){.shell{overflow:hidden}}
+.shell{height:100%;max-width:1680px;margin:0 auto;display:flex;flex-direction:column;gap:10px;padding:10px 16px 10px}
+@media (min-width:900px){.shell{overflow:hidden}}
 
-/* 上方控制列 */
-.top{flex:none;display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px}
-.brand{font-weight:700;font-size:1rem;white-space:nowrap}
-.brand small{font-weight:500;color:var(--muted);font-size:.78rem;margin-left:6px}
-.nav{display:flex;align-items:center;gap:6px}
-.nav .arrow{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:3px 12px;font-weight:700}
-.nav .arrow:disabled{opacity:.4;cursor:not-allowed}
-.count{font-variant-numeric:tabular-nums;font-size:.85rem;color:var(--muted);min-width:52px;text-align:center}
-.segs{display:flex;gap:3px;align-items:center;flex-wrap:wrap}
-.segs .gl{font-size:.68rem;color:var(--muted);margin:0 2px 0 6px;font-weight:700}
-.segs button{width:20px;height:8px;border-radius:9px;border:none;background:var(--panel-2);padding:0}
-.segs button.done{background:color-mix(in srgb,var(--prop) 45%,var(--panel-2))}
-.segs button[aria-current="true"]{background:var(--prop);height:10px}
-.tools{margin-left:auto;display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:.8rem;color:var(--muted)}
-.tools label{display:inline-flex;gap:5px;align-items:center;cursor:pointer}
-.tools select{font:inherit;font-size:.8rem;color:var(--fg);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:2px 6px;max-width:220px}
-.pill{display:inline-flex;align-items:center;gap:6px;padding:2px 10px;border-radius:999px;font-size:.75rem;font-weight:500;background:var(--panel-2);color:var(--muted);white-space:nowrap}
-.pill.live{background:var(--ok-soft);color:var(--ok)} .pill.off{background:var(--warn-soft);color:var(--warn)}
-.pill i{width:7px;height:7px;border-radius:50%;background:currentColor}
+/* 導覽列 */
+.top{flex:none;display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px}
+.brand{font-weight:700;font-size:1.02rem;white-space:nowrap}
+.brand small{font-weight:500;color:var(--muted);font-size:.78rem;margin-left:8px}
+.chap{display:flex;gap:6px;flex-wrap:wrap}
+.chap button{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:3px 12px;font-size:.8rem;color:var(--muted);white-space:nowrap}
+.chap button[aria-current="true"]{background:var(--prop);border-color:var(--prop);color:#fff;font-weight:700}
+.prog{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:.8rem;color:var(--muted)}
+.bar{width:120px;height:6px;border-radius:9px;background:var(--panel-2);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--prop);border-radius:9px;transition:width .3s}
 
-/* 場景說明列 */
-.cap{flex:none;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1.25fr) minmax(0,1fr);gap:10px 18px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px 16px}
-@media (max-width:1180px){.cap{grid-template-columns:minmax(0,1fr) minmax(0,1fr)} .cap .r{grid-column:1/-1}}
-@media (max-width:700px){.cap{grid-template-columns:minmax(0,1fr)}}
-.cap .l{display:flex;gap:12px;align-items:center;min-width:0}
-.fb{flex:none;width:44px;height:44px;border-radius:12px;background:var(--prop);color:#fff;display:grid;place-items:center;font-weight:700;font-size:1.25rem}
-.fb.neutral{background:var(--panel-2);color:var(--fg);font-size:.8rem}
-.cap h2{font-size:1.12rem;line-height:1.3}
-.meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:3px}
-.chip{display:inline-flex;align-items:center;gap:4px;font-size:.72rem;font-weight:700;border-radius:999px;padding:1px 9px;background:var(--panel-2);color:var(--muted)}
-.chip.slide{background:var(--fg);color:var(--bg)}
-.chip.p{background:var(--prop-soft);color:var(--prop-ink)}
-.cap .m{display:grid;gap:4px;min-width:0}
-.cap .m p{display:grid;grid-template-columns:42px minmax(0,1fr);gap:8px;font-size:.86rem;line-height:1.45}
-.cap .m b{font-size:.72rem;border-radius:4px;padding:1px 0;text-align:center;align-self:start;margin-top:2px}
-.cap .m .now b{background:var(--panel-2);color:var(--muted)}
-.cap .m .now span{color:var(--muted)}
-.cap .m .new b{background:var(--prop);color:#fff}
-.cap .m .new span{font-weight:700}
-.cap .r{display:flex;flex-direction:column;gap:6px;align-items:flex-start;min-width:0}
-.hint{font-size:.82rem;color:var(--fg);display:flex;gap:6px}
-.hint b{color:var(--prop-ink);white-space:nowrap}
-.runb{border:1px solid var(--prop);background:var(--prop-soft);color:var(--prop-ink);border-radius:8px;padding:3px 12px;font-size:.8rem;font-weight:700}
+/* 步驟說明卡 */
+.guide{flex:none;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr) auto;gap:10px 22px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 16px}
+.g-title{display:flex;gap:12px;align-items:center;min-width:0}
+.fb{flex:none;width:42px;height:42px;border-radius:12px;background:var(--prop);color:#fff;display:grid;place-items:center;font-weight:700;font-size:1.2rem}
+.g-title h2{font-size:1.1rem;line-height:1.3}
+.g-title small{display:block;font-size:.74rem;color:var(--muted);margin-top:2px}
+.g-mid{display:grid;gap:6px;min-width:0}
+.vs{display:grid;grid-template-columns:auto minmax(0,1fr);gap:3px 8px;font-size:.8rem;line-height:1.45}
+.vs b{font-size:.68rem;border-radius:4px;padding:1px 6px;align-self:start;margin-top:2px;text-align:center}
+.vs .o{background:var(--panel-2);color:var(--muted)} .vs .o + span{color:var(--muted)}
+.vs .n{background:var(--prop);color:#fff} .vs .n + span{font-weight:700}
+.gtodo{display:flex;gap:8px;align-items:flex-start;border-radius:10px;padding:7px 10px;background:var(--prop-soft);color:var(--prop-ink);font-size:.88rem;font-weight:700;line-height:1.45}
+.gtodo .k{flex:none;font-size:.7rem;background:var(--prop);color:#fff;border-radius:999px;padding:1px 8px;margin-top:2px;white-space:nowrap}
+.gtodo.done{background:var(--ok-soft);color:var(--ok)}
+.gtodo.done .k{background:var(--ok)}
+.gtodo .lost{font-weight:500;font-size:.78rem;color:var(--muted);margin-left:4px}
+.acts{display:flex;flex-direction:column;gap:8px}
+.acts > .gtodo{display:none}
+.abtns{display:flex;gap:8px;align-items:center}
+.btn{border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:8px 14px;font-weight:700;font-size:.86rem;white-space:nowrap}
+.btn.help{border-color:var(--prop);color:var(--prop-ink);background:var(--prop-soft)}
+.btn.next{background:var(--prop);border-color:var(--prop);color:#fff;padding:8px 18px}
+.btn.next.ready{animation:nudge 1.2s ease-in-out infinite;box-shadow:0 0 0 4px color-mix(in srgb,var(--prop) 30%,transparent)}
+@keyframes nudge{0%,100%{transform:translateX(0)}50%{transform:translateX(3px)}}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+@media (prefers-reduced-motion:reduce){.btn.next.ready{animation:none}}
 
 /* 舞台 */
-.stage{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) clamp(330px, calc((100vh - 220px) * .5), 390px);gap:16px}
-@media (max-width:980px){.stage{grid-template-columns:minmax(0,1fr)}}
+.stage{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) clamp(320px, calc((100vh - 260px) * .5), 380px);gap:16px}
 .col{display:flex;flex-direction:column;min-height:0;min-width:0;gap:5px}
-.label{flex:none;font-size:.7rem;font-weight:700;letter-spacing:.06em;color:var(--muted);display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
-.appsw{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--panel)}
-.appsw button{border:none;background:none;padding:2px 11px;font-size:.74rem;font-weight:500;color:var(--muted);position:relative;letter-spacing:0}
-.appsw button[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
-.appsw .badge{position:absolute;top:2px;right:3px;width:7px;height:7px;border-radius:50%;background:var(--accent)}
-.legend{flex:none;display:flex;flex-wrap:wrap;gap:4px 16px;font-size:.72rem;color:var(--muted);align-items:center}
+.clabel{flex:none;font-size:.72rem;font-weight:700;color:var(--muted);display:flex;justify-content:space-between;align-items:center;gap:8px}
+.devtabs{display:none}
+.legend{flex:none;display:flex;flex-wrap:wrap;gap:4px 18px;font-size:.72rem;color:var(--muted);align-items:center}
 .legend span{display:inline-flex;gap:6px;align-items:center}
-.sw{width:22px;height:12px;border-radius:3px;display:inline-block}
+.sw{width:20px;height:11px;border-radius:3px;display:inline-block}
 .sw.old{background:#d9dce2;border:1px solid #c3c7cf}
 .sw.new{background:#fff;border:2px solid #6a3fd1}
+
+/* 中等寬度：說明卡改成兩列（標題＋按鈕／現行與提案＋請操作） */
+@media (min-width:900px) and (max-width:1199px){
+  .guide{grid-template-columns:minmax(0,1fr) auto}
+  .g-mid{grid-column:1 / -1;grid-row:2;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);align-items:center;gap:6px 16px}
+}
+/* 窄螢幕：一次一台裝置，按鈕固定在底部 */
+@media (max-width:899px){
+  html{scroll-padding-top:44px;scroll-padding-bottom:calc(var(--barH, 130px) + 8px)}
+  .shell{height:auto;padding:10px 12px calc(var(--barH, 130px) + 14px);gap:10px}
+  .prog{margin-left:0;width:100%}
+  .bar{flex:1}
+  .guide{grid-template-columns:minmax(0,1fr);gap:8px;padding:12px}
+  .g-mid > .gtodo{display:none}
+  .acts{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--panel);border-top:1px solid var(--line);box-shadow:0 -6px 20px rgba(0,0,0,.08);padding:10px 12px calc(10px + env(safe-area-inset-bottom, 0px))}
+  .acts > .gtodo{display:flex;font-size:.84rem;padding:6px 10px}
+  .abtns .btn{flex:1;padding:10px 6px}
+  .stage{grid-template-columns:minmax(0,1fr)}
+  .devtabs{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--panel)}
+  .devtabs button{border:none;background:none;padding:9px 6px;font-weight:700;font-size:.84rem;color:var(--muted);position:relative}
+  .devtabs button[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
+  .devtabs .badge{position:absolute;top:8px;right:10px;width:8px;height:8px;border-radius:50%;background:var(--accent)}
+  .devtabs button.tgt{color:var(--prop-ink);background:var(--prop-soft);animation:pulse 1.3s ease-in-out infinite;outline:2px solid #8b5cf6;outline-offset:-3px;border-radius:12px}
+  .stage[data-view="owner"] .col-staff,.stage[data-view="staff"] .col-owner{display:none}
+  .clabel{display:none}
+  .legend{display:none}
+}
+
+/* ===== 開場／結尾 ===== */
+.modal{position:fixed;inset:0;z-index:40;background:rgba(15,17,21,.55);display:grid;padding:16px;overflow-y:auto;overscroll-behavior:contain}
+.mcard{margin:auto;background:var(--panel);color:var(--fg);border-radius:18px;max-width:760px;width:100%;padding:24px 24px 20px;display:grid;gap:14px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.mcard .eyebrow{font-size:.78rem;font-weight:700;color:var(--prop-ink);letter-spacing:.04em}
+.mcard h1{font-size:1.7rem;line-height:1.25}
+.mcard .lead{font-size:.95rem;color:var(--muted);max-width:60ch}
+.fcards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media (max-width:640px){
+  .fcards{grid-template-columns:minmax(0,1fr);gap:8px}
+  .fcard{grid-template-columns:28px minmax(0,1fr);column-gap:10px;padding:10px 12px}
+  .fcard .n{grid-row:span 3}
+  .mcard{padding:20px 18px 0;gap:12px}
+  .mcard h1{font-size:1.4rem}
+  .mrow{position:sticky;bottom:0;background:var(--panel);padding:10px 0 14px}
+  .mrow .btn.big{flex:1}
+  .mcard .fine{padding-bottom:16px}
+}
+.fcard{border:1px solid var(--line);border-radius:12px;padding:12px;display:grid;gap:4px;text-align:left;background:var(--panel)}
+.fcard .n{width:28px;height:28px;border-radius:8px;background:var(--prop);color:#fff;display:grid;place-items:center;font-weight:700}
+.fcard b{font-size:.92rem}
+.fcard span{font-size:.8rem;color:var(--muted)}
+.fcard small{font-size:.72rem;color:var(--prop-ink);font-weight:700}
+button.fcard:hover{border-color:var(--prop)}
+.how{display:grid;gap:6px;font-size:.84rem;background:var(--prop-soft);color:var(--prop-ink);border-radius:12px;padding:10px 14px}
+.how b{font-weight:700}
+.mrow{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.btn.big{font-size:1rem;padding:11px 26px}
+.mcard .fine{font-size:.72rem;color:var(--muted)}
+
+/* 指標 */
+.pointer{position:fixed;z-index:30;pointer-events:none;background:#6a3fd1;color:#fff;font-size:.78rem;font-weight:700;padding:4px 10px;border-radius:8px;white-space:nowrap;box-shadow:0 4px 14px rgba(106,63,209,.4);transform:translate(-50%,-100%);margin-top:-8px}
+.pointer::after{content:"";position:absolute;left:50%;bottom:-6px;margin-left:-6px;border:6px solid transparent;border-bottom:none;border-top-color:#6a3fd1}
+.pointer.below{transform:translate(-50%,0);margin-top:8px}
+.pointer.below::after{bottom:auto;top:-6px;border-top:none;border-bottom:6px solid #6a3fd1;border-top-color:transparent}
+.pointer.look{background:#1b7f45}
+.pointer.look::after{border-top-color:#1b7f45}
+.pointer.look.below::after{border-bottom-color:#1b7f45;border-top-color:transparent}
 
 /* ===== 裝置共用（固定淺色） ===== */
 .device{--r:#e50012;--r2:#c4000f;--rs:#fdecee;--ink:#1e1f22;--sub:#6e7279;--ln:#e4e5e8;--g1:#f4f5f7;--g2:#eceef1;--b1:#e6effc;--b2:#cfe0f8;--pp:#6a3fd1;
   color:var(--ink);font-family:var(--font)}
 .device button{color:inherit}
 .ic{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-/* 提案標示 */
 .pz{position:relative;z-index:2;box-shadow:0 0 0 2px var(--pp)}
-.pz[data-tag]::after{content:attr(data-tag);position:absolute;top:4px;right:4px;font-size:10px;font-weight:700;line-height:1;color:#fff;background:var(--pp);border-radius:999px;padding:3px 7px;z-index:3;pointer-events:none;letter-spacing:0}
+.pz[data-tag]::after{content:attr(data-tag);position:absolute;top:4px;right:4px;font-size:10px;font-weight:700;line-height:1;color:#fff;background:var(--pp);border-radius:999px;padding:3px 7px;z-index:3;pointer-events:none}
 .pz.lite{box-shadow:0 0 0 1.5px var(--pp)}
 .tscreen,.pscreen{position:relative;isolation:isolate}
-.focus .tscreen::after,.focus .pscreen::after{content:"";position:absolute;inset:0;background:rgba(236,238,242,.68);z-index:1;pointer-events:none}
+.tscreen::after,.pscreen::after{content:"";position:absolute;inset:0;background:rgba(236,238,242,.62);z-index:1;pointer-events:none}
 .pulse{outline:3px solid #8b5cf6 !important;outline-offset:2px;animation:pulse 1.3s ease-in-out infinite;position:relative;z-index:3}
+.pulse.look{outline-color:#1b7f45 !important;animation:none}
 @keyframes pulse{0%,100%{outline-color:#8b5cf6}50%{outline-color:rgba(139,92,246,.25)}}
 @media (prefers-reduced-motion:reduce){.pulse{animation:none}}
 
 /* ===== 平板 ===== */
 .tablet{flex:1;min-height:0;background:#2a2c31;border-radius:20px;padding:10px;display:flex}
 .tscreen{flex:1;min-width:0;background:#fff;border-radius:11px;overflow:hidden;display:flex;flex-direction:column}
-@media (max-width:980px){.tablet{flex:none;height:660px}}
+@media (max-width:899px){.tablet{flex:none;height:max(480px, 72vh);padding:6px;border-radius:14px}}
 .tbar{flex:none;display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px;padding:8px 14px;border-bottom:1px solid var(--ln)}
 .tbar .plate{font-weight:700;font-size:.92rem} .tbar .plate small{color:var(--sub);font-weight:400;font-size:.72rem}
-.tbar .clock{font-size:1.4rem;font-weight:500;font-variant-numeric:tabular-nums}
+.tbar .clock{font-size:1.35rem;font-weight:500;font-variant-numeric:tabular-nums}
 .tbar .date{color:var(--sub);font-size:.78rem}
 .tbar .who{margin-left:auto;color:var(--sub);font-size:.76rem;display:flex;align-items:center;gap:6px}
+@media (max-width:899px){.tbar .date,.tbar .who{display:none}}
 .ttabs{flex:none;display:flex;overflow-x:auto;border-bottom:1px solid var(--ln);background:#fafafa}
 .ttabs button{flex:1 0 auto;border:none;background:none;padding:8px 12px;font-size:.8rem;color:var(--sub);border-bottom:2px solid transparent;white-space:nowrap;display:flex;gap:5px;align-items:center;justify-content:center}
 .ttabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ink);font-weight:700;background:#fff}
@@ -130,7 +183,7 @@ p{margin:0}
 .tside{flex:none;width:60px;border-right:1px solid var(--ln);padding:8px 0;display:flex;flex-direction:column;gap:2px;align-items:center;overflow:hidden}
 .tside div{display:grid;justify-items:center;gap:1px;font-size:.58rem;color:var(--sub);padding:5px 2px;width:100%;text-align:center}
 .tside div.on{color:var(--ink);font-weight:700}
-@media (max-width:640px){.tside{display:none}}
+@media (max-width:1099px){.tside{display:none}}
 .tmain{flex:1;min-width:0;overflow-y:auto;padding:12px 14px 18px;display:grid;gap:12px;align-content:start}
 .trow{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:flex-end}
 .fld{display:grid;gap:3px;min-width:0}
@@ -144,18 +197,19 @@ p{margin:0}
 .uline{border:none;border-bottom:1px solid #bbb;padding:3px 2px;font:inherit;font-size:.86rem;background:transparent;color:var(--ink);min-width:0;width:100%}
 .tsec{display:grid;gap:9px;padding-top:10px;border-top:1px solid var(--ln)}
 .tsec h3{font-size:.86rem;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(125px,1fr));gap:8px 12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:8px 12px}
 .grid label{display:grid;gap:3px;font-size:.7rem;color:var(--sub)}
 .grid input,.grid select{font:inherit;font-size:.86rem;color:var(--ink);border:1px solid #c9ccd2;border-radius:6px;padding:4px 7px;background:#fff;width:100%}
 .grid input.warn{border-color:var(--r);color:var(--r);font-weight:700}
 .note-row{display:flex;gap:8px;align-items:stretch;background:#fff;border-radius:6px;padding:24px 6px 6px}
+.note-row.pz[data-tag]::after{left:6px;right:auto}
 .note-row textarea{flex:1;min-width:0;font:inherit;font-size:.84rem;color:var(--ink);border:1px solid #c9ccd2;border-radius:6px;padding:6px 8px;min-height:56px;resize:vertical;background:#fff}
 .mic{flex:none;width:84px;border:1px solid #c9ccd2;border-radius:6px;background:#fff;display:grid;place-items:center;align-content:center;gap:2px;font-size:.7rem;color:var(--sub)}
 .mic.rec{border-color:var(--r);color:var(--r);background:var(--rs)}
 .checks{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:.8rem}
 .checks label{display:flex;gap:6px;align-items:center}
 .checks input{accent-color:#1e1f22;width:15px;height:15px}
-.tbtn{border:1px solid #1e1f22;background:#fff;border-radius:4px;padding:5px 12px;font-size:.8rem;display:inline-flex;gap:6px;align-items:center}
+.tbtn{border:1px solid #1e1f22;background:#fff;border-radius:4px;padding:6px 12px;font-size:.8rem;display:inline-flex;gap:6px;align-items:center}
 .tbtn .ic{width:15px;height:15px}
 .tbtn.dark{background:#1e1f22;color:#fff}
 .tbtn.ai{background:var(--pp);border-color:var(--pp);color:#fff}
@@ -166,7 +220,7 @@ p{margin:0}
 .cat small{display:block;color:var(--sub);font-size:.68rem}
 .cat.hit{border-color:var(--r)} .cat.hit small{color:var(--r);font-weight:700}
 .carside{display:flex;justify-content:center}
-.carside svg{width:100%;max-width:300px;height:auto}
+.carside svg{width:100%;max-width:280px;height:auto}
 .tw{overflow-x:auto}
 .tt{border-collapse:collapse;width:100%;font-size:.78rem}
 .tt th{background:#f3f4f6;color:var(--sub);font-weight:500;text-align:left;padding:5px 8px;white-space:nowrap}
@@ -198,8 +252,9 @@ p{margin:0}
 
 /* ===== 手機 ===== */
 .phone{flex:1;min-height:0;width:100%;background:#1e1f22;border-radius:36px;padding:9px;display:flex}
-@media (max-width:980px){.phone{flex:none;height:720px;max-width:400px;margin:0 auto}}
+@media (max-width:899px){.phone{flex:none;height:max(540px, 76vh);max-width:430px;margin:0 auto;border-radius:24px;padding:5px}}
 .pscreen{flex:1;min-width:0;background:#fff;border-radius:28px;overflow:hidden;display:flex;flex-direction:column}
+@media (max-width:899px){.pscreen{border-radius:20px}}
 .sbar{flex:none;display:flex;justify-content:space-between;align-items:center;padding:7px 20px 3px;font-size:.76rem;font-weight:700;background:#fff}
 .sbar .r{display:flex;gap:5px;align-items:center}
 .sbar .demo{font-size:.58rem;font-weight:700;color:#fff;background:var(--pp);border-radius:4px;padding:0 5px}
@@ -208,9 +263,9 @@ p{margin:0}
 .homeind{flex:none;height:16px;display:grid;place-items:center;background:#fff}
 .homeind i{width:100px;height:4px;border-radius:9px;background:#1e1f22}
 .toast{position:absolute;left:50%;bottom:64px;transform:translateX(-50%);background:rgba(30,31,34,.92);color:#fff;font-size:.76rem;padding:6px 14px;border-radius:999px;white-space:nowrap;z-index:6}
-/* LINE */
 .lhead{flex:none;display:flex;align-items:center;gap:8px;padding:5px 12px 7px;background:#fff;border-bottom:1px solid var(--ln)}
-.lhead .nm{font-weight:700;font-size:.9rem}
+.lhead .nm{font-weight:700;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.lhead .nm small{font-weight:500;font-size:.62rem;color:var(--sub);margin-left:4px}
 .lhead .sp{margin-left:auto;display:flex;gap:10px;color:#444}
 .av{width:26px;height:26px;border-radius:50%;background:var(--r);color:#fff;display:grid;place-items:center;flex:none}
 .av .ic{width:15px;height:15px;stroke-width:2}
@@ -246,13 +301,12 @@ p{margin:0}
 .lmenu{flex:none;display:flex;align-items:center;gap:8px;padding:7px 12px;background:#fff;border-top:1px solid var(--ln);font-size:.78rem;color:#333}
 .lmenu .c{flex:1;text-align:center;font-weight:700}
 .lin{flex:none;background:#fff;border-top:1px solid var(--ln);padding:6px 8px 7px;display:grid;gap:6px}
-.qr{display:flex;gap:6px;overflow-x:auto;padding:3px 2px;border-radius:8px}
+.qr{display:flex;flex-wrap:wrap;gap:6px;padding:4px;border-radius:8px}
 .qr button{flex:none;border:1px solid #c9b8f0;background:#fff;color:var(--pp) !important;border-radius:999px;padding:3px 10px;font-size:.72rem}
 .lin form{display:flex;gap:6px;align-items:center}
 .lin input{flex:1;min-width:0;border:none;background:var(--g2);border-radius:999px;padding:6px 12px;font:inherit;font-size:.8rem;color:var(--ink)}
 .lin .send{border:none;background:none;color:#2a62b8 !important;font-weight:700;font-size:.8rem}
 .lin .send:disabled{color:#aaa !important}
-/* LIFF */
 .liff{flex:1;display:flex;flex-direction:column;min-height:0;background:#fff}
 .liffbar{flex:none;display:grid;grid-template-columns:40px 1fr 40px;align-items:center;padding:3px 8px;border-bottom:1px solid var(--ln)}
 .liffbar .t{text-align:center;font-weight:700;color:var(--r);letter-spacing:.06em;font-size:.88rem}
@@ -304,7 +358,6 @@ p{margin:0}
 .okview{flex:1;display:grid;place-items:center;align-content:center;gap:10px;background:#fff;text-align:center}
 .okview .c{width:60px;height:60px;border-radius:50%;background:#2a9257;display:grid;place-items:center;color:#fff}
 .okview .c .ic{width:32px;height:32px;stroke-width:2.6}
-/* My TOYOTA App */
 .app{flex:1;display:flex;flex-direction:column;min-height:0;background:#f4f5f7}
 .ahead{flex:none;display:grid;grid-template-columns:70px 1fr 70px;align-items:center;padding:3px 12px 7px;background:#fff}
 .ahead .pts{display:flex;gap:4px;align-items:center;font-size:.76rem;font-weight:700}
@@ -359,6 +412,8 @@ p{margin:0}
 .carwrap{display:grid;justify-items:center}
 .carwrap svg{width:100%;max-width:180px;height:auto}
 .hot{cursor:pointer}
+circle.pulse{outline:none !important;stroke:#8b5cf6;stroke-width:5;animation:svgp 1.3s ease-in-out infinite}
+@keyframes svgp{0%,100%{stroke-opacity:1}50%{stroke-opacity:.3}}
 .legend2{display:flex;flex-wrap:wrap;gap:5px;justify-content:center}
 .kc{background:#fff;border-radius:10px;margin:0 12px;padding:10px 12px;display:grid;gap:3px}
 .kc b{font-size:.82rem} .kc p{font-size:.76rem;color:#333} .kc small{font-size:.66rem;color:var(--pp);font-weight:700}
@@ -368,37 +423,30 @@ p{margin:0}
 <body>
 <div class="shell" id="shell">
   <header class="top">
-    <span class="brand">透明時刻 Clear Moment<small>提案 Demo｜配合簡報演示</small></span>
-    <div class="nav">
-      <button class="arrow" id="prev" aria-label="上一幕">‹</button>
-      <span class="count" id="count"></span>
-      <button class="arrow" id="next" aria-label="下一幕">›</button>
-    </div>
-    <div class="segs" id="segs" aria-label="場景"></div>
-    <div class="tools">
-      <select id="jump" aria-label="跳到場景"></select>
-      <label><input type="checkbox" id="focusT" checked> 聚焦提案功能</label>
-      <span class="pill">示範版｜AI 內容為預先寫好的範例</span>
-    </div>
+    <span class="brand">透明時刻 Clear Moment<small>和泰 AI 黑客松提案 Demo</small></span>
+    <nav class="chap" id="chap" aria-label="功能章節"></nav>
+    <div class="prog"><span id="count"></span><span class="bar"><i id="barI"></i></span></div>
   </header>
-  <section class="cap" id="cap" aria-live="polite"></section>
-  <main class="stage">
-    <div class="col">
-      <p class="label"><span>服務專員平板｜和泰現行工單系統（示意）</span></p>
+  <section class="guide" id="guide" aria-live="polite"></section>
+  <div class="devtabs" id="devtabs"></div>
+  <main class="stage" id="stage" data-view="staff">
+    <div class="col col-staff">
+      <p class="clabel"><span>服務專員的平板｜和泰現行工單系統（示意）</span></p>
       <div class="tablet device"><div class="tscreen" id="tablet"></div></div>
     </div>
-    <div class="col">
-      <p class="label"><span>車主手機</span><span class="appsw" id="appsw"></span></p>
+    <div class="col col-owner">
+      <p class="clabel"><span>車主的手機</span><span id="appname"></span></p>
       <div class="phone device"><div class="pscreen" id="phone"></div></div>
     </div>
   </main>
   <div class="legend">
-    <span><i class="sw old"></i>和泰現行系統（依手冊與附件示意，聚焦時變淡）</span>
-    <span><i class="sw new"></i>紫框＋「提案」標籤：本提案新增的 AI 功能</span>
-    <span>鍵盤 ← → 或簡報遙控器翻頁切換場景</span>
-    <span>AI 產生的內容皆為預先寫好的示範文字；資料皆為虛構；未使用官方商標與插圖</span>
+    <span><i class="sw new"></i>紫框＋「提案」標籤＝我們新增的 AI 功能</span>
+    <span><i class="sw old"></i>淡灰色＝和泰現有系統（示意）</span>
+    <span>非官方示意；資料皆為虛構；AI 內容為預先寫好的示範文字</span>
   </div>
 </div>
+<div class="pointer" id="pointer" hidden></div>
+<div id="modal"></div>
 
 <script>
 /* ================= 圖示 ================= */
@@ -434,39 +482,24 @@ function svgEl(str){ const t = document.createElement("template"); t.innerHTML =
 
 /* ================= 示範資料 ================= */
 const V = {plate:"ABC-2156", model:"YARIS", year:"2021 年式", owner:"李先生", phone:"0912***678", odo:41320, center:"示範服務廠",
-  addr:"示範市示範區服務路 100 號", tel:"02-0000-0000", advisor:"林專員", wo:"W2610100123",
-  usage:"平日市區通勤、每月約 880 公里；下個月有一趟環島長途旅行；車上的車道偏離警示目前是關閉狀態"};
-const HISTORY = ["2026/04/18｜36,050 km｜定期保養：機油、機油濾芯、空調濾網","2025/10/11｜30,820 km｜定期保養：機油、機油濾芯；電瓶檢測正常","2025/04/05｜25,900 km｜定期保養：機油、機油濾芯；四輪對調","前輪煞車來令片：新車至今未更換"];
+  addr:"示範市示範區服務路 100 號", tel:"02-0000-0000", advisor:"林專員", wo:"W2610100123"};
 const OLD_RECORDS = [{date:"2026/04/18",km:"36,050",amt:"$1,980"},{date:"2025/10/11",km:"30,820",amt:"$1,850"}];
 const QUOTE = {oil:{item:"機油＋機油濾芯更換",cat:"其他",price:1850,min:30}, pad:{item:"前輪煞車來令片更換",cat:"煞車",price:3600,min:40},
   tire:{item:"前輪輪胎更換（2 條）",cat:"輪胎",price:6400,min:40}, batt:{item:"電瓶更換",cat:"其他",price:4200,min:15}, wiper:{item:"前雨刷膠條更換",cat:"其他",price:650,min:10}};
 const money = n => "NT$" + n.toLocaleString();
-const KB = [
-  {t:"煞車來令片",x:"來令片是煞車時夾住碟盤產生摩擦的耗材，越用越薄。太薄時煞車距離變長，磨到底還會刮傷碟盤、增加維修費。示範標準：剩 3 mm 以下建議立即更換，3–4 mm 建議下次保養更換。新來令片前 200 公里煞車感覺可能略有不同，若出現尖銳異音請回廠檢查。"},
-  {t:"輪胎胎紋",x:"胎紋負責排水與抓地。胎紋越淺，雨天越容易打滑。依法規胎紋深度不得低於 1.6 mm；示範建議低於 3 mm 時規劃更換，長途或雨季前優先處理。"},
-  {t:"機油與機油濾芯",x:"機油負責潤滑與幫引擎散熱，用久會變質。示範保養週期為每 5,000 公里或 6 個月（先到者為準）更換。"},
-  {t:"電瓶",x:"電瓶提供發動電力。檢測結果為『建議更換』時，冬天或久停後可能無法發動；檢測正常則不需處理。"},
-  {t:"雨刷",x:"雨刷膠條硬化會留下水痕、發出異音，雨天視線變差。建議約每年更換一次。"},
-  {t:"冷卻液與燈光",x:"冷卻液避免引擎過熱；燈光包含大燈、方向燈、煞車燈。檢查正常時本次不需處理。"},
-  {t:"車道偏離警示",x:"車速達一定速度時，若車輛偏離車道會以聲音或畫面提醒。可在方向盤或儀表選單中開啟，長途駕駛時特別有幫助。"},
-  {t:"長途出遊前檢查",x:"出發前建議確認胎壓（含備胎或補胎工具）、胎紋、燈光與雨刷，並預留休息時間。"}];
-const SCEN = {
-  "煞車＋輪胎（預設）":{padF:2.5,padR:6.0,tireF:2.8,tireR:4.5,battery:"正常",oil:"到期",coolant:"正常",light:"正常",wiper:"正常",note:""},
-  "一般定期保養":{padF:6.5,padR:6.0,tireF:5.5,tireR:5.2,battery:"正常",oil:"到期",coolant:"正常",light:"正常",wiper:"正常",note:""},
-  "電瓶老化":{padF:5.0,padR:5.5,tireF:4.6,tireR:4.8,battery:"建議更換",oil:"到期",coolant:"正常",light:"正常",wiper:"正常",note:""}};
-const VOICE = {"煞車＋輪胎（預設）":"前輪來令片剩 2.5，今天一定要換。前輪胎紋 2.8 偏淺，客人說下個月要環島，建議出發前換。機油到期，其他都正常。",
-  "一般定期保養":"這次就是一般定保，換機油、機油芯，來令片跟輪胎都還很夠，其他正常。",
-  "電瓶老化":"電瓶 CCA 偏低，測試建議更換，冬天可能會發不動。機油到期一起換，其他正常。"};
+const INSP = {padF:2.5,padR:6.0,tireF:2.8,tireR:4.5,battery:"正常",oil:"到期",coolant:"正常",light:"正常",wiper:"正常",note:""};
+const VOICE = "前輪來令片剩 2.5，今天一定要換。前輪胎紋 2.8 偏淺，客人說下個月要環島，建議出發前換。機油到期，其他都正常。";
 const EXTRA_FINDING = "前雨刷膠條硬化、刮不乾淨，留下明顯水痕（技師已拍照）。";
 
 /* ================= 狀態 ================= */
-const S = {scene:0, step:1, tab:"入廠接待", scen:"煞車＋輪胎（預設）", insp:{...SCEN["煞車＋輪胎（預設）"]}, fuel:"3/4", mode:"在廠",
+function initState(){ return {scene:0, step:1, tab:"入廠接待", insp:{...INSP}, fuel:"3/4", mode:"在廠",
   checks:{"預約車已入廠":true,"車內設定已記錄":true,"保護套已裝設":true,"車內清潔":false,"洗車":true,"自備機油":false},
-  recording:false, translated:null, pushed:false, pushedAt:"", confirmed:false, qa:[], line:[], esc:[], busy:{}, err:{},
+  recording:false, translated:null, pushed:false, pushedAt:"", confirmed:false, askedOk:0, line:[], esc:[], busy:{},
   prog:0, extra:null, extraPushed:false, extraDecision:null, handover:{"實車說明確認檢修項目":false,"展示替換舊品":false,"恢復車主設定並移除保護措施":false,"下次保養時間說明":false},
-  summary:null, care:0, phone:{app:"line", page:"chat"}, unread:{line:0, app:0}, appTab:"progress", zone:null, knowledge:null,
-  bk:{date:null, slot:"10:00", wait:"否", contact:"任何時段（08:30–19:30）", notify:"LINE", note:""}, sheet:null, booked:null, toast:"", awaitCare:false};
-let toastTimer = null, lastPulse = "";
+  summary:null, care:0, viewedRecord:false, phone:{app:"line", page:"chat"}, unread:{line:0, app:0}, appTab:"progress", zone:null, knowledge:null,
+  bk:{date:null, slot:"10:00", wait:"否", contact:"任何時段（08:30–19:30）", notify:"LINE", note:""}, sheet:null, booked:null, toast:"", awaitCare:false, careReplied:false, view:"staff"}; }
+const S = initState();
+let toastTimer = null, lastTarget = "";
 
 /* ================= 工具 ================= */
 function h(tag, a, ...kids){
@@ -482,14 +515,11 @@ function h(tag, a, ...kids){
 const LV = {urgent:"立即處理", routine:"本次保養", soon:"建議近期", ok:"狀況良好"};
 const lv = l => h("span",{class:"lv "+l}, LV[l]||"");
 const clean = s => (typeof s === "string" ? s : "").trim();
-const normLevel = l => ["urgent","routine","soon","ok"].includes(l) ? l : "soon";
-const kbText = () => KB.map(k=>`【${k.t}】${k.x}`).join("\n");
 const nowClock = () => ({1:"09:42",2:"10:35",3:"11:58"})[S.step];
 const hm = m => String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0");
+const wait = ms => new Promise(r=>setTimeout(r, ms));
 function toast(msg){ S.toast = msg; clearTimeout(toastTimer); toastTimer = setTimeout(()=>{ S.toast=""; render(); }, 1800); render(); }
 function pushLine(msg){ S.line.push(msg); if (S.phone.app !== "line") S.unread.line++; }
-
-function resetFromInsp(){ S.translated=null; S.pushed=false; S.confirmed=false; S.line=[]; S.qa=[]; S.esc=[]; S.prog=0; S.extra=null; S.extraPushed=false; S.extraDecision=null; S.summary=null; S.care=0; S.knowledge=null; S.booked=null; S.awaitCare=false; S.zone=null; S.sheet=null; }
 function workItems(){
   const i = S.insp, out = [];
   if (i.oil === "到期") out.push({...QUOTE.oil, kind:"reg"});
@@ -500,7 +530,7 @@ function workItems(){
   return out;
 }
 
-/* ================= 預設內容 ================= */
+/* ================= 示範內容（預先寫好，依檢查數值組合） ================= */
 function fbTranslate(){
   const i = S.insp, items = [];
   if (+i.padF < 3) items.push({part:"前輪煞車來令片",level:"urgent",reason:`只剩 ${i.padF} mm，已低於 3 mm 的建議更換標準，繼續使用煞車距離會變長。`,history:"新車至今未更換，已使用約 4.1 萬公里。",cost:money(QUOTE.pad.price),time:`約 ${QUOTE.pad.min} 分鐘`,notice:"換新後前 200 公里煞車感覺可能略有不同。",source:"煞車來令片"});
@@ -521,7 +551,6 @@ function fbKnowledge(){
   if (tr.items.some(x=>/輪胎/.test(x.part) && x.level!=="ok")) c.push({title:"雨天煞車，留更長的距離",body:"胎紋變淺時排水能力下降，雨天煞車距離會變長。換新輪胎前，雨天請放慢車速、拉開車距。",why:"您的前輪胎紋偏淺"});
   if (tr.items.some(x=>/來令片/.test(x.part) && x.level==="urgent")) c.push({title:"新來令片的前 200 公里",body:"新換的來令片需要一段磨合，前 200 公里避免不必要的急煞。若出現尖銳異音，請回廠檢查。",why:"您今天更換了前輪來令片"});
   c.push({title:"出發環島前，先開啟車道偏離警示",body:"長途開高速公路容易疲勞，車道偏離警示會在車子偏出車道時提醒您。可以在儀表選單中開啟，交車時也可以請專員示範。",why:"您的車目前關閉這項功能，下個月要長途旅行"});
-  c.push({title:"長途出發前的 4 項檢查",body:"確認胎壓（含補胎工具）、胎紋、燈光與雨刷，並預留休息時間。",why:"下個月有環島行程"});
   return c.slice(0,3);
 }
 function nextService(){ const months = Math.min(6, 5000/880); const d = new Date(2026, 9, 10); d.setDate(d.getDate() + Math.round(months*30.4));
@@ -542,15 +571,9 @@ function fbSummary(){
 }
 
 /* ================= 模擬 AI（內容皆為程式內預先寫好的示範資料） ================= */
-const wait = ms => new Promise(r=>setTimeout(r, ms));
 async function fake(key, ms){ S.busy[key] = true; render(); await wait(ms); S.busy[key] = false; }
-async function doTranslate(){
-  if (S.busy.translate) return;
-  S.translated = null; S.pushed = false; S.confirmed = false;
-  await fake("translate", 1000);
-  S.translated = fbTranslate(); render();
-}
-function pushExplain(){ if (!S.translated) S.translated = fbTranslate(); S.pushed = true; S.pushedAt = "09:44"; pushLine({t:"time", text:"09:44"}); pushLine({t:"explain"}); S.phone = {app:"line", page:"chat"}; S.unread.line = 0; render(); scrollFeed(); }
+async function doTranslate(){ if (S.busy.translate || S.pushed) return; S.translated = null; await fake("translate", 1000); S.translated = fbTranslate(); render(); }
+function pushExplain(){ if (S.pushed) return; if (!S.translated) S.translated = fbTranslate(); S.pushed = true; S.pushedAt = "09:44"; pushLine({t:"time", text:"09:44"}); pushLine({t:"explain"}); S.phone = {app:"line", page:"chat"}; S.unread.line = 0; render(); scrollFeed(); }
 function confirmWork(){
   if (S.confirmed) return; S.confirmed = true;
   pushLine({t:"me", text:"同意施作"});
@@ -564,37 +587,38 @@ async function doAsk(q){
   const ans = fbAnswer(q);
   pushLine({t:"oa", text:ans.answer, src:ans.source, ai:true});
   if (ans.escalate){ pushLine({t:"time", text:`已通知${V.advisor}，對話摘要已附上`, ai:true}); S.esc.unshift({from:"LINE 追問｜維修說明", text:ans.summary || ("車主詢問：" + q), at:"09:45"}); }
+  else S.askedOk++;
   render(); scrollFeed();
 }
 function fbAnswer(q){
   const i = S.insp;
   const mins = approved().reduce((s,x)=>s+(+((/(\d+)/.exec(x.time||"")||[0,0])[1])),0);
-  if (/折|優惠|便宜|太貴|打折|殺價|算便宜/.test(q)) return {answer:`費用與優惠的部分，我請${V.advisor}親自跟您說明，請稍候。`,source:"",escalate:true,summary:"車主詢問費用能否優惠，對報價有疑慮。"};
+  if (/折|優惠|便宜|太貴|打折|殺價/.test(q)) return {answer:`費用與優惠的部分，我請${V.advisor}親自跟您說明，請稍候。`,source:"",escalate:true,summary:"車主詢問費用能否優惠，對報價有疑慮。"};
   if (/不滿|生氣|爛|投訴|客訴/.test(q)) return {answer:`很抱歉讓您不愉快，我已請${V.advisor}馬上過來跟您說明。`,source:"",escalate:true,summary:"車主表達不滿，請專員優先處理。"};
   if (/來令|煞車|剎車/.test(q)) return {answer:`您的前輪來令片剩 ${i.padF} mm${+i.padF<3?"，已低於 3 mm 的建議更換標準。延後使用，緊急煞車時距離會變長，所以建議今天更換，約 40 分鐘。":"，目前還在標準內，不需要今天更換。"}`,source:"煞車來令片",escalate:false};
   if (/胎/.test(q)) return {answer:`您的前輪胎紋 ${i.tireF} mm，${+i.tireF>=3?"狀況正常，不需要更換。":+i.tireF>=1.6?"還高於法規的 1.6 mm，今天不換也能開；但雨天抓地力會下降，建議下個月環島出發前更換。":"已低於法規 1.6 mm，需要今天更換。"}`,source:"輪胎胎紋",escalate:false};
   if (/機油/.test(q)) return {answer:"機油每 5,000 公里或 6 個月更換一次，您距離上次更換剛好滿 6 個月，所以這次一起換。",source:"機油與機油濾芯",escalate:false};
-  if (/電瓶/.test(q)) return {answer:i.battery==="建議更換"?"這次檢測電瓶建議更換，冬天或久停後可能無法發動；今天不換的話，請避免長時間停放不發動。":"電瓶這次檢測正常，不需要更換。",source:"電瓶",escalate:false};
+  if (/電瓶/.test(q)) return {answer:i.battery==="建議更換"?"這次檢測電瓶建議更換，冬天或久停後可能無法發動。":"電瓶這次檢測正常，不需要更換。",source:"電瓶",escalate:false};
   if (/多久|時間|幾點|等/.test(q)) return {answer:`今天確認施作的項目加上檢查與試車，預計約 ${mins+40} 分鐘完成。進度可以在 My TOYOTA App 即時查看，完工前會通知您。`,source:"工單工時",escalate:false};
   if (/雨刷/.test(q)) return {answer:"雨刷膠條硬化會留下水痕，雨天視線變差，建議約每年更換一次。",source:"雨刷",escalate:false};
   return {answer:`這個問題我請${V.advisor}直接跟您說明，比較準確。`,source:"",escalate:true,summary:"車主提出知識庫以外的問題：「"+q+"」"};
 }
-async function doExtra(){ if (S.busy.extra) return; await fake("extra", 900); S.extra = {...FB_EXTRA}; render(); }
-function pushExtra(){ if (!S.extra) S.extra = {...FB_EXTRA}; S.extraPushed = true; pushLine({t:"time", text:"10:35"}); pushLine({t:"extra"}); if (S.phone.app !== "app") S.unread.app++; render(); scrollFeed(); }
+async function doExtra(){ if (S.busy.extra || S.extra) return; await fake("extra", 900); S.extra = {...FB_EXTRA}; render(); }
+function pushExtra(){ if (S.extraPushed) return; if (!S.extra) S.extra = {...FB_EXTRA}; S.extraPushed = true; pushLine({t:"time", text:"10:35"}); pushLine({t:"extra"}); if (S.phone.app !== "app") S.unread.app++; render(); }
 function decideExtra(v){ if (S.extraDecision) return; S.extraDecision = v; pushLine({t:"me", text: v==="yes" ? "同意加做雨刷膠條" : "雨刷先不處理"}); pushLine({t:"oa", text: v==="yes" ? "好的，已加入工單，預計完成時間已更新。" : "了解，已記錄為下次建議項目。"}); render(); }
-async function doKnowledge(){ if (S.busy.knowledge) return; await fake("knowledge", 900); S.knowledge = fbKnowledge(); render(); }
-async function doSummary(){ if (S.busy.summary) return; await fake("summary", 1000); S.summary = fbSummary(); render(); }
-function sendSummary(){ if (!S.summary) S.summary = fbSummary(); S.care = 1; pushLine({t:"time", text:"11:58"}); pushLine({t:"summary"}); if (S.phone.app !== "app") S.unread.app++; S.phone = {app:"line", page:"chat"}; S.unread.line = 0; render(); scrollFeed(); }
+async function doKnowledge(){ if (S.busy.knowledge || S.knowledge) return; await fake("knowledge", 900); S.knowledge = fbKnowledge(); render(); }
+async function doSummary(){ if (S.busy.summary || S.summary) return; await fake("summary", 1000); S.summary = fbSummary(); render(); }
+function sendSummary(){ if (S.care) return; if (!S.summary) S.summary = fbSummary(); S.care = 1; pushLine({t:"time", text:"11:58"}); pushLine({t:"summary"}); if (S.phone.app !== "app") S.unread.app++; S.phone = {app:"line", page:"chat"}; S.unread.line = 0; render(); scrollFeed(); }
 function careTo(n){
   for (let k = S.care+1; k <= n; k++){
-    if (k===2){ pushLine({t:"time", text:"交車後 3 天"}); pushLine({t:"oa", ai:true, text:`${V.owner}您好，${approved().some(x=>/來令/.test(x.part))?"前輪來令片換新已經 3 天了，煞車的感覺還順嗎？":"保養完已經 3 天了，車子開起來還順嗎？"}有任何狀況都可以直接回覆我們。`}); S.awaitCare = true; }
+    if (k===2){ pushLine({t:"time", text:"交車後 3 天"}); pushLine({t:"oa", ai:true, text:`${V.owner}您好，前輪來令片換新已經 3 天了，煞車的感覺還順嗎？有任何狀況都可以直接回覆我們。`}); S.awaitCare = true; }
     if (k===3){ pushLine({t:"time", text:"交車後 1 個月"}); pushLine({t:"tip"}); }
     if (k===4){ pushLine({t:"time", text:"下次保養前 2 週"}); pushLine({t:"remind"}); }
   }
   if (n > S.care) S.care = n;
 }
 async function doCare(q){
-  q = clean(q); if (!q || S.busy.care) return;
+  q = clean(q); if (!q || S.busy.care || !S.awaitCare) return;
   pushLine({t:"me", text:q}); render(); scrollFeed();
   await fake("care", 700);
   const bad = /聲|音|怪|抖|燈|異|不滿|問題|漏|味|不順|偏/.test(q);
@@ -602,94 +626,121 @@ async function doCare(q){
                 : {reply:"太好了，謝謝您的回覆！有任何狀況都可以直接在這裡告訴我們。",escalate:false};
   pushLine({t:"oa", text:r.reply, ai:true});
   if (r.escalate){ pushLine({t:"time", ai:true, text:"已轉給電訪專員，今天會主動聯絡您"}); S.esc.unshift({from:"售後關懷｜交車後 3 天回覆", text:r.summary, at:"交車後 3 天"}); }
-  S.awaitCare = false; render(); scrollFeed();
+  S.awaitCare = false; S.careReplied = true; render(); scrollFeed();
 }
+function advance(){ const st = progSteps(); if (S.prog < st.length){ S.prog++; if (S.prog === st.length) pushLine({t:"oa", text:"您的愛車已完工，請到交車區，專員會為您說明今天的檢修內容。"}); } render(); }
+function fakeVoice(){
+  if (S.recording || S.insp.note) return; S.recording = true; render();
+  let k = 0;
+  const tm = setInterval(()=>{ k += 2; S.insp.note = VOICE.slice(0,k); const ta = document.getElementById("note"); if (ta) ta.value = S.insp.note;
+    if (k >= VOICE.length){ clearInterval(tm); S.recording = false; render(); } }, 40);
+}
+function progSteps(){ const arr = [{label:"進廠檢查", min:10}]; for (const i of approved()) arr.push({label:"更換"+i.part.replace(/^更換/,""), min:+((/(\d+)/.exec(i.time||"")||[0,20])[1])}); arr.push({label:"安全檢查與試車",min:15},{label:"洗車與交車準備",min:15}); return arr; }
 
-/* ================= 確保前置狀態（跳場景時使用） ================= */
-function ensureTranslated(){ if (!S.translated) S.translated = fbTranslate(); }
-function ensurePushed(){ ensureTranslated(); if (!S.pushed){ S.pushed = true; S.pushedAt = "09:44"; S.line.push({t:"time", text:"09:44"},{t:"explain"}); } }
+/* ================= 跳步驟時補齊前置狀態 ================= */
+function ensurePushed(){ if (!S.insp.note) S.insp.note = VOICE; if (!S.translated) S.translated = fbTranslate(); if (!S.pushed){ S.pushed = true; S.pushedAt = "09:44"; S.line.push({t:"time", text:"09:44"},{t:"explain"}); } }
 function ensureConfirmed(){ ensurePushed(); if (!S.confirmed){ S.confirmed = true; S.line.push({t:"me", text:"同意施作"},{t:"oa", text:"已收到您的確認，維修開始後可以在 My TOYOTA App 查看即時進度。"}); } }
 function ensureSummary(){ ensureConfirmed(); if (!S.summary) S.summary = fbSummary(); if (!S.care){ S.care = 1; S.line.push({t:"time", text:"11:58"},{t:"summary"}); } }
 function ensureCare(n){ ensureSummary(); careTo(n); }
 
-/* ================= 場景（對應簡報頁碼） ================= */
-const FEAT = {0:"", 1:"AI 維修翻譯官", 2:"智慧客休體驗", 3:"個人化售後關懷"};
+/* ================= 步驟（對應簡報頁碼） ================= */
+const FEAT = {1:"AI 維修翻譯官", 2:"智慧客休體驗", 3:"個人化售後關懷"};
+const NUM = ["","①","②","③"];
 const LINE_CHAT = () => { S.phone = {app:"line", page:"chat"}; S.unread.line = 0; };
 const APP = (page, tab) => { S.phone = {app:"app", page}; if (tab) S.appTab = tab; S.unread.app = 0; };
 const SCENES = [
-  {key:"intro", f:0, ph:1, slide:"P5", title:"Demo 導覽：AI 嵌進和泰現有的三個系統",
-    now:"灰色畫面＝和泰現行的平板工單、官方 LINE、My TOYOTA App（依手冊與附件示意）",
-    next:"紫框＋「提案」標籤＝本提案新增的 AI 功能，共三項：① AI 維修翻譯官 ② 智慧客休體驗 ③ 個人化售後關懷",
-    hint:"按 → 開始；每一幕上方都會寫出「現行做法」與「提案」的差別", view(){ S.tab="入廠接待"; LINE_CHAT(); }},
-  {key:"voice", f:1, ph:1, slide:"P6", title:"專員口述檢查結果",
-    now:"專員在平板逐項輸入、再口頭解釋", next:"環車時直接口述，語音自動轉成文字，成為 AI 說明的素材",
-    hint:"點平板上閃爍的「口述（模擬）」", targets:()=> S.insp.note ? ["note-row"] : ["mic"], view(){ S.tab="入廠接待"; LINE_CHAT(); }, run:()=>fakeVoice()},
-  {key:"translate", f:1, ph:1, slide:"P6", title:"AI 產生白話說明，專員確認後推送",
-    now:"專員看著作業明細，口頭解釋專業術語", next:"AI 比對原廠車主指南與保養紀錄，把原因、費用、注意事項說成白話；費用直接引用工單",
-    hint:"點「產生白話說明」→「確認並推送至車主 LINE」", targets:()=> !S.translated ? ["translate"] : !S.pushed ? ["push"] : ["explain-card"],
-    view(){ S.tab="費用說明"; LINE_CHAT(); }, run:async()=>{ if (!S.translated) await doTranslate(); if (!S.pushed) pushExplain(); }},
-  {key:"card", f:1, ph:1, slide:"P6", title:"車主在 LINE 看懂並線上確認施作",
-    now:"車主聽完口頭說明，在平板上簽名", next:"車主收到白話說明卡（紅黃綠標示輕重緩急），看完整說明後線上確認，取代紙本簽名",
-    hint:"點手機「完整說明」或「同意施作」，平板「工單確認」會同步", targets:()=> S.confirmed ? ["sign"] : ["confirm"],
-    prep(){ ensurePushed(); }, view(){ S.tab="工單確認"; LINE_CHAT(); }, run:()=>confirmWork()},
-  {key:"ask", f:1, ph:1, slide:"P7", title:"看不懂就追問，AI 依原廠資料回答",
-    now:"車主要等專員有空才能問，常常不好意思問", next:"AI 依原廠車主指南與這台車的紀錄即時回答，並附上資料出處",
-    hint:"點手機快速回覆「來令片一定要今天換嗎？」，也可以自己輸入問題", targets:()=>["q0"],
-    prep(){ ensurePushed(); }, view(){ S.tab="費用說明"; LINE_CHAT(); }, run:()=>doAsk("來令片一定要今天換嗎？")},
-  {key:"escalate", f:1, ph:1, slide:"P7・P11", title:"複雜問題自動轉給專員",
-    now:"所有問題都要專員回答，同樣內容重複解說", next:"議價、不滿或答不出來時，AI 自動轉給專員並附對話摘要，專員不用從頭問",
-    hint:"點手機「費用可以打折嗎？」，看平板上方跳出的通知", targets:()=> S.esc.some(e=>/LINE 追問/.test(e.from)) ? ["esc"] : ["q2"],
-    prep(){ ensurePushed(); }, view(){ S.tab="費用說明"; LINE_CHAT(); }, run:()=>doAsk("費用可以打折嗎？")},
-  {key:"extra", f:1, ph:2, slide:"P7", title:"中間報告：在客休室線上決定",
-    now:"專員走回客休室當面報告，車主不在現場就要打電話", next:"技師的發現由 AI 翻成白話推送到車主手機，車主在客休室直接決定",
-    hint:"平板「產生中間報告」→「推送」，再點手機「同意加做」", targets:()=> !S.extra ? ["extra-gen"] : !S.extraPushed ? ["extra-push"] : !S.extraDecision ? ["extra-card"] : ["extra-status"],
-    prep(){ ensureConfirmed(); }, view(){ S.tab="中間報告"; APP("progress","progress"); }, run:async()=>{ if (!S.extra) await doExtra(); if (!S.extraPushed) pushExtra(); else if (!S.extraDecision) decideExtra("yes"); }},
-  {key:"progress", f:2, ph:2, slide:"P8", title:"今日回廠進度與等待建議",
-    now:"客休室電子看板只顯示「施工中」，不知道還要等多久", next:"手機看到正在做哪一步、預計幾點完成；AI 依剩餘時間建議在廠休息或先去附近走走",
-    hint:"點平板「技師完成」推進進度，手機同步更新", targets:()=>["advance","progress-card"],
-    prep(){ ensureConfirmed(); }, view(){ S.tab="中間報告"; APP("progress","progress"); }, run:()=>advance()},
+  {key:"intro", overlay:"welcome"},
+  {key:"translate", f:1, ph:1, slide:"P6", title:"專員口述，AI 產生白話說明",
+    now:"專員看著作業明細，用專業術語口頭解釋", next:"AI 比對原廠資料與保養紀錄，把原因、費用、注意事項翻成白話，專員確認後推送到車主 LINE",
+    steps:[
+      {t:"mic", say:"點平板上的「口述（模擬）」，專員口述檢查結果", done:()=>!!S.insp.note && !S.recording, run:fakeVoice},
+      {t:"tab-費用說明", say:"點平板上方的「費用說明」分頁", done:()=>S.tab==="費用說明" || S.pushed, run:()=>{ S.tab="費用說明"; render(); }},
+      {t:"translate", say:"點紫色按鈕「產生白話說明」", done:()=>!!S.translated, run:doTranslate},
+      {t:"push", say:"點紅色按鈕「確認並推送至車主 LINE」", done:()=>S.pushed, run:pushExplain}],
+    result:"explain-card", resultSay:"車主手機的 LINE 收到白話說明卡", view(){ S.tab = S.pushed ? "費用說明" : "入廠接待"; LINE_CHAT(); }},
+  {key:"confirm", f:1, ph:1, slide:"P6", title:"車主在 LINE 看懂並確認施作",
+    now:"車主聽完口頭說明，在平板上簽名", next:"車主看白話說明卡（紅黃綠標示輕重緩急），直接在 LINE 確認施作，取代紙本簽名",
+    steps:[{t:"confirm", say:"在車主手機上點紅色按鈕「同意施作」", done:()=>S.confirmed, run:confirmWork}],
+    result:"sign", resultSay:"平板「工單確認」同步顯示車主已線上確認", prep:ensurePushed, view(){ S.tab="工單確認"; LINE_CHAT(); }},
+  {key:"ask", f:1, ph:1, slide:"P7・P11", title:"看不懂就問，複雜問題轉給專員",
+    now:"車主要等專員有空才能問，同樣內容專員要重複解說", next:"AI 依原廠資料即時回答並附出處；議價、不滿或答不出來時，自動轉給專員並附對話摘要",
+    steps:[
+      {t:"q0", say:"在車主手機下方點「來令片一定要今天換嗎？」", done:()=>S.askedOk>0, run:()=>doAsk("來令片一定要今天換嗎？")},
+      {t:"q2", say:"再點「費用可以打折嗎？」，看 AI 怎麼處理議價", done:()=>S.esc.some(e=>/LINE/.test(e.from)), run:()=>doAsk("費用可以打折嗎？")}],
+    result:"esc", resultSay:"議價問題自動轉給專員，平板上方出現附摘要的通知", prep:()=>{ ensurePushed(); }, view(){ S.tab="費用說明"; LINE_CHAT(); }},
+  {key:"extra", f:1, ph:2, slide:"P7", title:"中間報告：車主在客休室線上決定",
+    now:"專員走回客休室當面報告，車主不在就要打電話", next:"技師的新發現由 AI 翻成白話推送到車主手機，車主直接線上決定",
+    steps:[
+      {t:"extra-gen", say:"點平板上的紫色按鈕「產生中間報告」", done:()=>!!S.extra, run:doExtra},
+      {t:"extra-push", say:"點紅色按鈕「確認並推送給車主」", done:()=>S.extraPushed, run:pushExtra},
+      {t:"extra-yes", say:"在車主手機上點「同意加做」", done:()=>!!S.extraDecision, run:()=>decideExtra("yes")}],
+    result:"extra-status", resultSay:"車主的決定即時回到平板，工單同步更新", prep:ensureConfirmed, view(){ S.tab="中間報告"; APP("progress","progress"); }},
+  {key:"progress", f:2, ph:2, slide:"P8", title:"回廠進度與等待建議",
+    now:"客休室看板只顯示「施工中」，不知道還要等多久", next:"車主手機看得到正在做哪一步、預計幾點完成，並依剩餘時間建議在廠休息或先去走走",
+    steps:[{t:"advance", say:"點平板下方的「技師完成：…」，模擬技師完成一個步驟", done:()=>S.prog>0, run:advance}],
+    result:"progress-card", resultSay:"車主手機上的進度同步更新", prep:ensureConfirmed, view(){ S.tab="中間報告"; APP("progress","progress"); }},
   {key:"car", f:2, ph:2, slide:"P8", title:"車況圖解：看懂自己的車",
-    now:"車主看不到車子哪裡有問題，只能聽專員描述", next:"在車輛示意圖上標出本次檢查部位與紅黃綠狀態，點一下就有白話說明",
-    hint:"點手機車圖上的彩色圓點（例如前輪）", targets:()=> S.zone ? ["zone-detail"] : ["carsvg"],
-    prep(){ ensureConfirmed(); }, view(){ S.tab="中間報告"; APP("progress","car"); }, run:()=>{ S.zone = "front"; render(); }},
+    now:"車主看不到車子哪裡有問題，只能聽專員描述", next:"在車輛示意圖上用紅黃綠標出檢查部位，點一下就有白話說明",
+    steps:[{t:"carsvg", say:"在車主手機的車圖上，點紅色圓點（前輪）", done:()=>!!S.zone, run:()=>{ S.zone="front"; render(); }}],
+    result:"zone-detail", resultSay:"點選的部位顯示白話說明", prep:ensureConfirmed, view(){ S.tab="中間報告"; APP("progress","car"); }},
   {key:"know", f:2, ph:2, slide:"P8", title:"個人化用車知識",
-    now:"書報、飲品等客休服務人人相同", next:"依車型、里程、今天的檢查結果與用車情境，推薦 3 分鐘看完的知識卡",
-    hint:"點手機「產生我的知識卡」", targets:()=> S.knowledge ? ["know-list"] : ["know-btn"],
-    prep(){ ensureConfirmed(); }, view(){ S.tab="中間報告"; APP("progress","know"); }, run:()=>doKnowledge()},
-  {key:"summary", f:3, ph:3, slide:"P9", title:"交車：AI 服務摘要",
-    now:"交車時口頭說明，明細都是專業術語，回家就忘", next:"AI 整理白話服務摘要與注意事項，存入 App 保修紀錄並推送 LINE",
-    hint:"平板「產生服務摘要」→「上傳 App 並推送 LINE」", targets:()=> !S.summary ? ["sum-gen"] : !S.care ? ["sum-push"] : ["summary-card"],
-    prep(){ ensureConfirmed(); }, view(){ S.tab="交車說明"; LINE_CHAT(); }, run:async()=>{ if (!S.summary) await doSummary(); if (!S.care) sendSummary(); }},
-  {key:"record", f:3, ph:3, slide:"P9", title:"App 保修紀錄：白話檢診說明",
-    now:"保修紀錄只有品項和金額", next:"「檢診說明」換成 AI 白話摘要，車主隨時回看，也能轉給家人",
-    hint:"手機已切到 My TOYOTA App 保修紀錄", targets:()=>["detail-ai"],
-    prep(){ ensureSummary(); }, view(){ S.tab="交車說明"; APP("detail"); }},
-  {key:"care3", f:3, ph:3, slide:"P9", title:"交車後 3 天：自動關懷與 AI 分流",
-    now:"電訪專員逐一打電話，車主常漏接", next:"AI 透過 LINE 自動關懷；車主回報異常時才轉給電訪專員，並附優先程度",
-    hint:"點手機「煞車的時候有一點聲音」，看平板上方的分流通知", targets:()=> S.awaitCare ? ["q1"] : ["esc"],
-    prep(){ ensureCare(2); }, view(){ S.tab="交車說明"; LINE_CHAT(); }, run:()=>doCare("煞車的時候有一點聲音")},
-  {key:"tip", f:3, ph:3, slide:"P9", title:"交車後 1 個月：個人化用車小叮嚀",
-    now:"離廠後到下次保養前，沒有個人化的提醒", next:"依檢查紀錄與用車情境（下個月環島）主動推送提醒",
-    hint:"看手機 LINE 的小叮嚀卡片", targets:()=>["tip-card"],
-    prep(){ ensureCare(3); }, view(){ S.tab="交車說明"; LINE_CHAT(); }},
+    now:"書報、飲品等客休服務人人相同", next:"依車型、里程、檢查結果與用車情境，推薦 3 分鐘看完的知識卡",
+    steps:[{t:"know-btn", say:"在車主手機上點紫色按鈕「產生我的知識卡」", done:()=>!!S.knowledge, run:doKnowledge}],
+    result:"know-list", resultSay:"為這位車主挑選的知識卡", prep:ensureConfirmed, view(){ S.tab="中間報告"; APP("progress","know"); }},
+  {key:"summary", f:3, ph:3, slide:"P9", title:"交車：白話服務摘要",
+    now:"交車時口頭說明，明細都是專業術語，回家就忘", next:"AI 整理白話服務摘要與注意事項，推送 LINE 並存入 App 保修紀錄",
+    steps:[
+      {t:"sum-gen", say:"點平板上的紫色按鈕「產生服務摘要」", done:()=>!!S.summary, run:doSummary},
+      {t:"sum-push", say:"點紅色按鈕「上傳 App 並推送 LINE」", done:()=>S.care>=1, run:sendSummary},
+      {t:"open-record", say:"在車主手機上點「查看保修紀錄（My TOYOTA App）」", done:()=>S.viewedRecord, run:()=>{ APP("detail"); render(); }}],
+    result:"detail-ai", resultSay:"App 保修紀錄的「檢診說明」變成白話摘要", prep:ensureConfirmed, view(){ S.tab="交車說明"; if (S.viewedRecord) APP("detail"); else LINE_CHAT(); }},
+  {key:"care", f:3, ph:3, slide:"P9", title:"交車後 3 天：自動關懷與 AI 分流",
+    now:"電訪專員逐一打電話，車主常漏接", next:"AI 透過 LINE 自動關懷；車主回報異常時才轉給電訪專員，並標示優先程度",
+    steps:[{t:"q1", say:"在車主手機下方點「煞車的時候有一點聲音」", done:()=>S.careReplied, run:()=>doCare("煞車的時候有一點聲音")}],
+    result:"esc", resultSay:"異常回報自動轉給電訪專員，平板上方出現通知", prep:()=>ensureCare(2), view(){ S.tab="交車說明"; LINE_CHAT(); }},
   {key:"remind", f:3, ph:3, slide:"P9", title:"保養提醒與一鍵預約",
-    now:"預約前兩天才電話提醒；車主要自己填預約表單", next:"依里程預測主動提醒，一鍵進入現有預約表單，建議日期與上次建議項目由 AI 預先帶入",
-    hint:"點「一鍵預約回廠」→「確定送出」→「確定」", targets:()=> S.booked ? ["booked"] : S.phone.page==="liff-book" ? (S.sheet ? [] : ["bk-date","bk-note","bk-submit"]) : ["remind-btn"],
-    prep(){ ensureCare(4); }, view(){ S.tab="交車說明"; LINE_CHAT(); },
-    run:()=>{ if (S.booked) return; if (S.phone.page !== "liff-book") openBooking(); else if (S.sheet !== "confirm"){ S.sheet = "confirm"; render(); } else submitBooking(); }},
-  {key:"end", f:0, ph:3, slide:"P5・P13", title:"總結：三個功能，嵌入三個現有系統",
-    lines:[["①","AI 維修翻譯官｜平板工單＋官方 LINE：說明聽得懂、問得到"],["②","智慧客休體驗｜My TOYOTA App：等待時看懂自己的車"],["③","個人化售後關懷｜App 保修紀錄＋官方 LINE：離廠後服務不斷線"]],
-    hint:"車主不用多裝 App、專員不用學新系統：落地門檻低", view(){ S.tab="交車說明"; LINE_CHAT(); }}
+    now:"預約前兩天才電話提醒，車主要自己填預約表單", next:"依里程預測主動提醒，一鍵進入現有預約表單，日期與備註由 AI 預先帶入",
+    steps:[
+      {t:"remind-btn", say:"在車主手機上點保養提醒的「一鍵預約回廠」", done:()=>S.phone.page==="liff-book" || !!S.booked, run:openBooking},
+      {t:"bk-submit", say:"日期與備註已由 AI 帶好，點最下方的「確定送出」", done:()=>S.sheet==="confirm" || !!S.booked, run:()=>{ S.sheet="confirm"; render(); }},
+      {t:"bk-ok", say:"點「確定」完成預約", done:()=>!!S.booked, run:submitBooking}],
+    result:"booked", resultSay:"接回現有預約流程，收到預約成功通知", prep:()=>ensureCare(4), view(){ S.tab="交車說明"; LINE_CHAT(); }},
+  {key:"end", overlay:"end"}
 ];
-const sceneTargets = () => { const sc = SCENES[S.scene]; return sc.targets ? sc.targets() : []; };
+const LAST = SCENES.length - 1, REAL = SCENES.filter(s=>!s.overlay).length;
+function curStep(){ const sc = SCENES[S.scene]; if (!sc.steps) return null; const i = sc.steps.findIndex(s=>!s.done()); return i < 0 ? null : {i, s:sc.steps[i], n:sc.steps.length}; }
+function sceneDone(){ const sc = SCENES[S.scene]; return !!sc.steps && !curStep(); }
+function targetInfo(){
+  const sc = SCENES[S.scene]; if (!sc.steps) return {t:"", look:false};
+  const st = curStep(); if (st) return {t:st.s.t, look:false};
+  if (sc.key==="care" && !S.esc.some(e=>/售後/.test(e.from))) return {t:"", look:true};
+  return {t:sc.result, look:true};
+}
 function goScene(i){
-  i = Math.max(0, Math.min(SCENES.length-1, i));
-  const sc = SCENES[i]; S.scene = i; S.step = sc.ph; S.sheet = null;
-  if (sc.prep) sc.prep();
-  if (sc.view) sc.view();
-  lastPulse = ""; render(); if (S.phone.app === "line") scrollFeed();
+  i = Math.max(0, Math.min(LAST, i));
+  const sc = SCENES[i]; S.scene = i; S.sheet = null;
+  if (!sc.overlay){ S.step = sc.ph; if (sc.prep) sc.prep(); if (sc.view) sc.view(); }
+  lastTarget = ""; render(); if (S.phone.app === "line") scrollFeed();
   try { history.replaceState(null, "", "#" + sc.key); } catch {}
 }
+// 目標所在的畫面（評審點到別的分頁時，「幫我點一下」會先帶回來）
+const TAB = t => () => { S.tab = t; };
+const SHOW = {
+  "mic":TAB("入廠接待"), "translate":TAB("費用說明"), "push":TAB("費用說明"), "sign":TAB("工單確認"),
+  "extra-gen":TAB("中間報告"), "extra-push":TAB("中間報告"), "extra-status":TAB("中間報告"), "advance":TAB("中間報告"),
+  "sum-gen":TAB("交車說明"), "sum-push":TAB("交車說明"),
+  "explain-card":LINE_CHAT, "confirm":LINE_CHAT, "q0":LINE_CHAT, "q1":LINE_CHAT, "q2":LINE_CHAT, "open-record":LINE_CHAT, "remind-btn":LINE_CHAT,
+  "extra-yes":()=>APP("progress"), "progress-card":()=>APP("progress","progress"), "carsvg":()=>APP("progress","car"), "zone-detail":()=>APP("progress","car"),
+  "know-btn":()=>APP("progress","know"), "know-list":()=>APP("progress","know"), "detail-ai":()=>APP("detail")
+};
+const findTarget = t => t ? [...document.querySelectorAll("[data-t]")].find(e=>e.dataset.t===t) : null;
+function helpMe(){
+  const info = targetInfo(); const tEl = findTarget(info.t);
+  if (tEl && narrow.matches){ const dev = tEl.closest(".col-staff") ? "staff" : "owner"; if (dev !== S.view){ S.view = dev; lastTarget = ""; render(); return; } }
+  if (info.t && !findTarget(info.t) && SHOW[info.t] && !Object.values(S.busy).some(Boolean)){ S.sheet = null; SHOW[info.t](); lastTarget = ""; render(); if (S.phone.app === "line") scrollFeed(); return; }
+  const st = curStep(); if (st) st.s.run();
+}
+function restart(){ Object.assign(S, initState()); goScene(1); }
 
 /* ================= 平板：工單系統 ================= */
 const TABS = ["入廠接待","工單開立","費用說明","工單確認","中間報告","交車說明"];
@@ -699,7 +750,7 @@ function tablet(){
     h("span",{class:"plate"}, V.plate, " ", h("small",null,`（工單 ${V.wo}）`)),
     h("span",{class:"clock"}, nowClock()), h("span",{class:"date"},"(六) 2026/10/10"),
     h("span",{class:"who"}, ic("user"), `服務專員　${V.advisor}`));
-  const tabs = h("div",{class:"ttabs",role:"tablist"}, TABS.map(t=>h("button",{role:"tab","aria-selected":S.tab===t?"true":"false", onclick:()=>{S.tab=t; render();}}, t, AI_TABS[t] ? h("span",{class:"dot",title:"含提案 AI 功能"}) : null)));
+  const tabs = h("div",{class:"ttabs",role:"tablist"}, TABS.map(t=>h("button",{role:"tab","data-t":"tab-"+t,"aria-selected":S.tab===t?"true":"false", onclick:()=>{S.tab=t; render();}}, t, AI_TABS[t] ? h("span",{class:"dot",title:"含提案 AI 功能"}) : null)));
   const e = S.esc[0];
   const notice = e ? h("div",{class:"tnotice pz","data-tag":"提案 AI 分流","data-t":"esc"}, h("b",null,`需要專員處理（${S.esc.length}）｜${e.from}｜${e.at}`), h("span",null,e.text)) : null;
   const side = h("div",{class:"tside","aria-hidden":"true"}, [["clip","接待作業","on"],["car","車輛履歷"],["list","保修紀錄"],["cal","今日預約"],["box","零件查詢"],["chart","進度看板"]].map(([i,l,c])=>h("div",{class:c||""}, ic(i), l)));
@@ -708,16 +759,15 @@ function tablet(){
 }
 function aiPanel(tag, title, desc, ...body){ return h("div",{class:"aip pz","data-tag":tag}, h("div",{class:"hd"}, h("span",{class:"spark"}, ic("spark"), "AI"), h("b",null,title)), desc ? h("p",{class:"desc"},desc) : null, ...body); }
 function thinking(key, text){ return S.busy[key] ? h("p",{class:"st thinking"}, text) : null; }
-function errNote(key){ return S.err[key] ? h("p",{class:"st warn"}, S.err[key]) : null; }
 function prevList(items){ return h("div",{class:"prev"}, items.map(i=>h("div",null, lv(i.level), h("b",null,i.part), i.reason ? h("p",null,i.reason) : null))); }
 function tabContent(){
   const t = S.tab;
   if (t === "入廠接待"){
     const i = S.insp;
     const low = k => (k.startsWith("pad") && +i[k] < 3) || (k.startsWith("tire") && +i[k] < 3);
-    const num = (k,label) => h("label",null,label, h("input",{type:"number",step:"0.1",min:"0",value:i[k],class:low(k)?"warn":null, onchange:e=>{ i[k] = e.target.value; resetFromInsp(); render(); }}));
-    const sel = (k,label,opts) => h("label",null,label, h("select",{onchange:e=>{ i[k]=e.target.value; resetFromInsp(); render(); }}, opts.map(o=>h("option",{value:o, selected:i[k]===o},o))));
-    const ta = h("textarea",{id:"note","aria-label":"專員口述",placeholder:"按右側麥克風口述，語音會轉成文字", oninput:e=>{ i.note = e.target.value; }}); ta.value = i.note;
+    const num = (k,label) => h("label",null,label, h("input",{type:"number",step:"0.1",min:"0",value:i[k],class:low(k)?"warn":null, readonly:true}));
+    const sel = (k,label) => h("label",null,label, h("input",{value:i[k],readonly:true}));
+    const ta = h("textarea",{id:"note","aria-label":"專員口述",placeholder:"按右側「口述（模擬）」，語音會自動轉成文字", readonly:true}); ta.value = i.note;
     return [
       h("div",{class:"trow"},
         h("div",{class:"fld"}, h("span",null,"入廠類別"), h("div",{class:"fakesel"},"一般維修",h("span",null,"▾"))),
@@ -726,21 +776,20 @@ function tabContent(){
       h("div",{class:"trow"},
         h("div",{class:"fld"}, h("span",null,"油量"), h("div",{class:"seg"}, ["E","1/4","1/2","3/4","F"].map(m=>h("button",{"aria-pressed":S.fuel===m?"true":"false", onclick:()=>{S.fuel=m; render();}},m)))),
         h("div",{class:"fld",style:"width:86px"}, h("span",null,"里程數"), h("input",{class:"uline",value:String(V.odo),readonly:true,"aria-label":"里程數"})),
-        h("div",{class:"fld",style:"flex:1;min-width:190px"}, h("span",null,"顧客需求"), h("input",{class:"uline",value:"定期保養；下個月要環島，想確認輪胎狀況",readonly:true,"aria-label":"顧客需求"}))),
+        h("div",{class:"fld",style:"flex:1;min-width:180px"}, h("span",null,"顧客需求"), h("input",{class:"uline",value:"定期保養；下個月要環島，想確認輪胎狀況",readonly:true,"aria-label":"顧客需求"}))),
       h("div",{class:"tsec"},
         h("h3",null,"環車檢查紀錄"),
         h("div",{class:"grid"}, num("padF","前輪來令片（mm）"), num("padR","後輪來令片（mm）"), num("tireF","前輪胎紋（mm）"), num("tireR","後輪胎紋（mm）"),
-          sel("battery","電瓶檢測",["正常","建議更換"]), sel("oil","機油",["未到期","到期"]), sel("coolant","冷卻液",["正常","不足"]), sel("light","燈光",["正常","異常"]), sel("wiper","雨刷",["正常","硬化"])),
-        h("div",{class:"note-row pz","data-tag":"提案① 語音轉文字","data-t":"note-row"}, ta, h("button",{class:"mic"+(S.recording?" rec":""),"data-t":"mic", onclick:fakeVoice, disabled:S.recording}, ic("mic"), S.recording ? "辨識中" : "口述（模擬）"))),
+          sel("battery","電瓶檢測"), sel("oil","機油"), sel("coolant","冷卻液"), sel("light","燈光"), sel("wiper","雨刷")),
+        h("div",{class:"note-row pz","data-tag":"提案① 語音轉文字"}, ta, h("button",{class:"mic"+(S.recording?" rec":""),"data-t":"mic", onclick:fakeVoice, disabled:S.recording || !!S.insp.note}, ic("mic"), S.recording ? "辨識中" : S.insp.note ? "已完成" : "口述（模擬）"))),
       h("div",{class:"tsec"},
         h("h3",null,"入廠確認"),
-        h("div",{class:"checks"}, Object.keys(S.checks).map(k=>h("label",null, h("input",{type:"checkbox",checked:S.checks[k], onchange:e=>{S.checks[k]=e.target.checked;}}), k)))),
-      h("div",{class:"trow"}, h("button",{class:"tbtn dark", onclick:()=>toast("已暫存資料")}, ic("check"), "暫存資料"), h("button",{class:"tbtn", onclick:()=>{S.tab="費用說明"; render();}}, "下一步：費用說明 ›"))
+        h("div",{class:"checks"}, Object.keys(S.checks).map(k=>h("label",null, h("input",{type:"checkbox",checked:S.checks[k], onchange:e=>{S.checks[k]=e.target.checked;}}), k))))
     ];
   }
   if (t === "工單開立"){
     const w = workItems().filter(x=>x.kind!=="sug");
-    return [h("p",{class:"st"},"現行功能：依入廠接待資料一鍵開立工單（Demo 僅示意）。"),
+    return [h("p",{class:"st"},"現行功能：依入廠接待資料一鍵開立工單（示意）。"),
       h("div",{class:"tw"}, h("table",{class:"tt"}, h("thead",null,h("tr",null,h("th",null,"#"),h("th",null,"作業項目"),h("th",null,"類別"),h("th",{class:"n"},"工時"))),
         h("tbody",null, w.map((x,k)=>h("tr",null,h("td",null,k+1),h("td",null,x.item),h("td",null,x.kind==="must"?"必要":"定保"),h("td",{class:"n"},x.min+" 分")))))) ];
   }
@@ -752,9 +801,9 @@ function tabContent(){
     return [
       aiPanel("提案① 維修翻譯官","AI 維修翻譯官｜車主版白話說明", "比對原廠車主指南與這台車的保養紀錄，把下方作業轉成車主看得懂的說明；費用與工時直接引用工單，專員確認後才推送。",
         h("div",{class:"trow"},
-          h("button",{class:"tbtn ai","data-t":"translate", disabled:S.busy.translate||S.pushed, onclick:doTranslate}, ic("spark"), S.busy.translate ? "產生中…" : tr ? "重新產生" : "產生白話說明"),
+          tr ? null : h("button",{class:"tbtn ai","data-t":"translate", disabled:!!S.busy.translate, onclick:doTranslate}, ic("spark"), S.busy.translate ? "產生中…" : "產生白話說明"),
           tr && !S.pushed ? h("button",{class:"tbtn red","data-t":"push", onclick:pushExplain}, "確認並推送至車主 LINE") : null),
-        thinking("translate","AI 正在比對車主指南與保養紀錄"), errNote("translate"),
+        thinking("translate","AI 正在比對車主指南與保養紀錄"),
         tr ? prevList(tr.items) : null,
         S.pushed ? h("p",{class: "st " + (S.confirmed?"ok":"")}, S.confirmed ? "車主已在 LINE 確認施作，工單確認完成（取代紙本簽名）。" : `已於 ${S.pushedAt} 推送至車主 LINE，等待車主確認。`) : null),
       h("div",{class:"tsec"}, h("h3",null,"費用說明（現行）"),
@@ -771,7 +820,7 @@ function tabContent(){
       h("div",{class:"tw"}, h("table",{class:"tt"}, h("thead",null,h("tr",null,h("th",null,"確認項目"),h("th",{class:"n"},"金額"))),
         h("tbody",null, a.map(x=>h("tr",null,h("td",null,x.part),h("td",{class:"n"},money(priceOf(x.part)))))),
         h("tfoot",null,h("tr",null,h("td",null,"合計"),h("td",{class:"n"},money(a.reduce((s,x)=>s+priceOf(x.part),0))))))),
-      h("p",{class:"st pz " + (S.confirmed?"ok":"warn"),"data-tag":"提案①","data-t":"sign",style:"padding-right:64px"}, S.confirmed ? "車主簽名：已於官方 LINE 線上確認（09:46），取代紙本簽名" : S.pushed ? "車主簽名：等待車主於 LINE 確認" : "尚未推送白話說明給車主（請至「費用說明」）")
+      h("p",{class:"st pz " + (S.confirmed?"ok":"warn"),"data-tag":"提案①","data-t":"sign",style:"padding-right:64px"}, S.confirmed ? "車主簽名：已於官方 LINE 線上確認（09:46），取代紙本簽名" : S.pushed ? "車主簽名：等待車主於 LINE 確認" : "尚未推送白話說明給車主")
     ];
   }
   if (t === "中間報告"){
@@ -779,19 +828,19 @@ function tabContent(){
     return [
       h("div",{class:"tsec",style:"border-top:none;padding-top:0"},
         h("h3",null,"技師回報｜新增待修項目（現行）"),
-        h("div",{class:"trow",style:"align-items:flex-start"}, h("div",{class:"photo"}, ic("cam")), h("div",{style:"flex:1;min-width:170px;display:grid;gap:4px;font-size:.8rem"}, h("b",null,"王技師｜10:32"), h("span",null,EXTRA_FINDING)))),
+        h("div",{class:"trow",style:"align-items:flex-start"}, h("div",{class:"photo"}, ic("cam")), h("div",{style:"flex:1;min-width:160px;display:grid;gap:4px;font-size:.8rem"}, h("b",null,"王技師｜10:32"), h("span",null,EXTRA_FINDING)))),
       aiPanel("提案① 中間報告","AI 維修翻譯官｜中間報告", "把技師的發現轉成白話說明推送到車主手機，車主在客休室就能線上決定。",
         h("div",{class:"trow"},
-          h("button",{class:"tbtn ai","data-t":"extra-gen", disabled:S.busy.extra||S.extraPushed, onclick:doExtra}, ic("spark"), S.busy.extra ? "產生中…" : S.extra ? "重新產生" : "產生中間報告"),
+          S.extra ? null : h("button",{class:"tbtn ai","data-t":"extra-gen", disabled:!!S.busy.extra, onclick:doExtra}, ic("spark"), S.busy.extra ? "產生中…" : "產生中間報告"),
           S.extra && !S.extraPushed ? h("button",{class:"tbtn red","data-t":"extra-push", onclick:pushExtra},"確認並推送給車主") : null),
-        thinking("extra","AI 正在產生中間報告"), errNote("extra"),
+        thinking("extra","AI 正在產生中間報告"),
         S.extra ? prevList([S.extra]) : null,
         S.extraPushed ? h("p",{class:"st " + (S.extraDecision==="yes"?"ok":""),"data-t":"extra-status"}, S.extraDecision==="yes" ? "車主已線上同意加做，已加入工單。" : S.extraDecision==="no" ? "車主選擇暫不處理，已記錄為下次建議項目。" : "已推送，等待車主回覆。") : null),
       h("div",{class:"tsec"},
-        h("h3",null,"維修進度（現行看板資料；提案：同步推送到車主手機）"),
+        h("h3",null,"維修進度（提案：同步推送到車主手機）"),
         h("ol",{class:"ptl"}, st.map((x,k)=>{ const tm = hm(start+acc); acc += x.min;
           return h("li",{class:k<idx?"done":k===idx?"now":"todo"}, h("time",null,tm), h("span",{class:"d"}), h("span",null,x.label), h("small",{style:"color:#6e7279"}, x.min+" 分")); })),
-        h("div",{class:"trow"}, h("button",{class:"tbtn dark","data-t":"advance", disabled:idx>=st.length, onclick:advance}, idx>=st.length ? "已完工" : "技師完成：" + st[idx].label), h("button",{class:"tbtn", onclick:()=>{S.prog=0; render();}},"重設")))
+        h("div",{class:"trow"}, h("button",{class:"tbtn dark","data-t":"advance", disabled:idx>=st.length, onclick:advance}, idx>=st.length ? "已完工" : "技師完成：" + st[idx].label)))
     ];
   }
   const ns = nextService();
@@ -799,12 +848,12 @@ function tabContent(){
     h("div",{class:"tsec",style:"border-top:none;padding-top:0"},
       h("h3",null,"交車說明檢核（現行）"),
       h("div",{class:"checks"}, Object.keys(S.handover).map(k=>h("label",null, h("input",{type:"checkbox",checked:S.handover[k], onchange:e=>{S.handover[k]=e.target.checked;}}), k)))),
-    aiPanel("提案③ 服務摘要","AI 服務摘要｜上傳保修紀錄並推送 LINE", "依今天實際施作、建議下次處理的項目與保養預測，整理成白話摘要，存入 App 保修紀錄的「檢診說明」並推送官方 LINE。",
+    aiPanel("提案③ 服務摘要","AI 服務摘要｜上傳保修紀錄並推送 LINE", "依今天實際施作、建議下次處理的項目與保養預測，整理成白話摘要，存入 App 保修紀錄並推送官方 LINE。",
       h("p",{class:"st"}, `下次保養預測：約 ${ns.km.toLocaleString()} km 或 ${ns.date}（依每月約 880 km 推估）`),
       h("div",{class:"trow"},
-        h("button",{class:"tbtn ai","data-t":"sum-gen", disabled:S.busy.summary||S.care>0, onclick:doSummary}, ic("spark"), S.busy.summary ? "整理中…" : S.summary ? "重新產生" : "產生服務摘要"),
+        S.summary ? null : h("button",{class:"tbtn ai","data-t":"sum-gen", disabled:!!S.busy.summary, onclick:doSummary}, ic("spark"), S.busy.summary ? "整理中…" : "產生服務摘要"),
         S.summary && !S.care ? h("button",{class:"tbtn red","data-t":"sum-push", onclick:sendSummary},"上傳 App 並推送 LINE") : null),
-      thinking("summary","AI 正在整理服務摘要"), errNote("summary"),
+      thinking("summary","AI 正在整理服務摘要"),
       S.summary ? h("div",{class:"prev"}, h("div",null, h("span",{class:"lv routine"},"摘要"), h("b",null,S.summary.headline), h("p",null,S.summary.next))) : null,
       S.care ? h("p",{class:"st ok"},"已上傳 My TOYOTA App 保修紀錄，並推送官方 LINE。") : null),
     h("div",{class:"tsec pz","data-tag":"提案③ 關懷排程",style:"padding:8px;border-radius:8px;background:#fff"},
@@ -814,14 +863,6 @@ function tabContent(){
           h("tr",null,h("td",null,a),h("td",null,b),h("td",null,c),h("td",null, S.care>=n ? "已送出" : "排程中")))))),
       S.booked ? h("p",{class:"st ok"},`車主已透過保養提醒完成預約：${S.booked.text}`) : null)
   ];
-}
-function progSteps(){ const arr = [{label:"進廠檢查", min:10}]; for (const i of approved()) arr.push({label:"更換"+i.part.replace(/^更換/,""), min:+((/(\d+)/.exec(i.time||"")||[0,20])[1])}); arr.push({label:"安全檢查與試車",min:15},{label:"洗車與交車準備",min:15}); return arr; }
-function advance(){ const st = progSteps(); if (S.prog < st.length){ S.prog++; if (S.prog === st.length) pushLine({t:"oa", text:"您的愛車已完工，請到交車區，專員會為您說明今天的檢修內容。"}); } render(); }
-function fakeVoice(){
-  if (S.recording) return; S.recording = true; S.insp.note = ""; render();
-  const text = VOICE[S.scen] || VOICE["煞車＋輪胎（預設）"]; let k = 0;
-  const tm = setInterval(()=>{ k += 2; S.insp.note = text.slice(0,k); const ta = document.getElementById("note"); if (ta) ta.value = S.insp.note;
-    if (k >= text.length){ clearInterval(tm); S.recording = false; const note = S.insp.note; resetFromInsp(); S.insp.note = note; render(); } }, 40);
 }
 
 /* ================= 手機 ================= */
@@ -842,14 +883,14 @@ function phone(){
 }
 function oaRow(content){ return h("div",{class:"lrow"}, h("div",{class:"av"}, ic("car")), content); }
 function lineChat(){
-  const head = h("div",{class:"lhead"}, ic("back"), h("div",{class:"av"}, ic("car")), h("span",{class:"nm"},"TOYOTA 官方帳號"), h("span",{class:"sp"}, ic("search"), ic("menu")));
+  const head = h("div",{class:"lhead"}, ic("back"), h("div",{class:"av"}, ic("car")), h("span",{class:"nm"},"TOYOTA 官方帳號", h("small",null,"示意")), h("span",{class:"sp"}, ic("search"), ic("menu")));
   const feed = h("div",{class:"lfeed",id:"feed"});
   feed.append(h("div",{class:"ltime"},"今天 09:31"));
   feed.append(oaRow(h("div",{class:"lb"}, `${V.owner}您好！已確認您的愛車 ${V.plate.replace(/\d{2}$/,"**")} 到達${V.center}，今天由${V.advisor}為您服務。`)));
   for (const m of S.line){
     if (m.t === "time") feed.append(h("div",{class:"ltime"+(m.ai?" pz":"")}, m.text));
     else if (m.t === "me") feed.append(h("div",{class:"lrow me"}, h("div",{class:"lb"}, m.text)));
-    else if (m.t === "oa") feed.append(oaRow(h("div",{class:"lb"+(m.ai?" pz lite":"")}, m.text, m.src ? h("span",{class:"src"},"資料來源：示範知識庫「"+m.src+"」") : null)));
+    else if (m.t === "oa") feed.append(oaRow(h("div",{class:"lb"+(m.ai?" pz lite":"")}, m.text, m.src ? h("span",{class:"src"},"資料來源："+m.src) : null)));
     else if (m.t === "explain") feed.append(oaRow(flexExplain()));
     else if (m.t === "extra") feed.append(oaRow(flexExtra()));
     else if (m.t === "summary") feed.append(oaRow(flexSummary()));
@@ -858,13 +899,12 @@ function lineChat(){
     else if (m.t === "booked") feed.append(oaRow(flexBooked()));
   }
   if (S.busy.chat || S.busy.care) feed.append(oaRow(h("div",{class:"lb thinking"}, "正在查資料")));
-  const err = S.err.chat || S.err.care; if (err) feed.append(h("div",{class:"ltime"}, err));
   const needInput = (S.pushed && S.step===1) || S.awaitCare;
   let bottom;
   if (needInput){
     const quick = S.awaitCare ? ["一切正常，謝謝！","煞車的時候有一點聲音"] : ["來令片一定要今天換嗎？","輪胎可以下次再換嗎？","費用可以打折嗎？"];
     const send = S.awaitCare ? doCare : doAsk; const busy = !!(S.busy.chat || S.busy.care);
-    const input = h("input",{type:"text",id:"lineInput",placeholder:"輸入訊息","aria-label":"輸入訊息",autocomplete:"off"});
+    const input = h("input",{type:"text",id:"lineInput",placeholder:"也可以自己輸入問題","aria-label":"輸入訊息",autocomplete:"off"});
     bottom = h("div",{class:"lin"}, h("div",{class:"qr pz lite"}, quick.map((q,k)=>h("button",{"data-t":"q"+k, disabled:busy, onclick:()=>send(q)}, q))),
       h("form",{onsubmit:e=>{e.preventDefault(); const v = input.value; input.value=""; send(v);}}, ic("kb"), input, h("button",{class:"send",disabled:busy},"傳送")));
   } else bottom = h("div",{class:"lmenu"}, ic("kb"), h("span",{class:"c"},"點開選單 ▾"));
@@ -876,7 +916,7 @@ function flexExplain(){
   const tr = S.translated || fbTranslate();
   return flex("car",{pz:1,tag:"提案① 白話說明",t:"explain-card"}, h("div",{class:"bd"}, h("span",{class:"pl"}, V.plate), h("h4",null,"今日檢查結果｜白話說明"), h("p",{class:"tx"}, tr.greeting), tr.items.map(litem)),
     h("div",{class:"ft"}, S.confirmed ? h("button",{class:"lbtn",disabled:true},"已確認施作") : h("button",{class:"lbtn","data-t":"confirm", onclick:confirmWork},"同意施作"),
-      h("div",{class:"two"}, h("button",{class:"lbtn o", onclick:()=>{S.phone.page="liff-explain"; render();}},"完整說明"), h("button",{class:"lbtn o", onclick:()=>document.getElementById("lineInput")?.focus()},"我想再問問"))));
+      h("button",{class:"lbtn o", onclick:()=>{S.phone.page="liff-explain"; render();}},"完整說明")));
 }
 function flexExtra(){
   const x = S.extra || FB_EXTRA;
@@ -890,12 +930,11 @@ function flexSummary(){
       sm.done.map(d=>h("div",{class:"lit"}, h("b",null,d.item), h("span",null,d.plain))),
       sm.notices.length ? h("div",{class:"lit"}, h("b",null,"接下來要注意"), sm.notices.map(n=>h("span",null,"・"+n))) : null,
       sm.next ? h("p",{class:"tx"}, sm.next) : null),
-    h("div",{class:"ft"}, h("button",{class:"lbtn", onclick:()=>{ APP("detail"); render(); }},"查看保修紀錄（My TOYOTA App）")));
+    h("div",{class:"ft"}, h("button",{class:"lbtn","data-t":"open-record", onclick:()=>{ APP("detail"); render(); }},"查看保修紀錄（My TOYOTA App）")));
 }
 function flexTip(){
-  const tr = S.translated || fbTranslate(); const tire = tr.items.find(x=>/輪胎/.test(x.part) && x.level!=="ok");
   return flex("bulb",{pz:1,tag:"提案③ 小叮嚀",t:"tip-card"}, h("div",{class:"bd"}, h("h4",null,"環島出發前的小叮嚀"),
-    h("p",{class:"tx"}, (tire ? `您的前輪胎紋 ${S.insp.tireF} mm 偏淺，長途與雨天前建議先更換；` : "") + "出發前記得確認胎壓、燈光與雨刷，並開啟車道偏離警示，長途駕駛更安心。"),
+    h("p",{class:"tx"}, `您的前輪胎紋 ${S.insp.tireF} mm 偏淺，長途與雨天前建議先更換；出發前記得確認胎壓、燈光與雨刷，並開啟車道偏離警示。`),
     h("p",{class:"aihint"},"✦ 依您的檢查紀錄與用車情境推送")));
 }
 function flexRemind(){
@@ -908,7 +947,7 @@ function flexRemind(){
 function flexBooked(){
   const b = S.booked;
   return flex("cal",{t:"booked"}, h("div",{class:"bd"}, h("h4",null,"預約保養成功通知"),
-      h("p",{class:"tx"},"TOYOTA 車主您好，您已成功預約回廠保養，預約資訊如下："),
+      h("p",{class:"tx"},"您已成功預約回廠保養，預約資訊如下："),
       h("p",{class:"big"}, b.dateLabel), h("p",{class:"bigr"}, b.slot),
       h("div",{class:"kv"}, h("span",null,"服務據點"), h("span",null,V.center), h("span",null,"服務電話"), h("span",null,V.tel+"（示範）"), h("span",null,"車牌號碼"), h("span",null,V.plate.replace(/\d{2}$/,"**")),
         h("span",null,"在廠等候"), h("span",null,b.wait), h("span",null,"其他意見"), h("span",null,b.note||"無"))),
@@ -917,7 +956,7 @@ function flexBooked(){
 }
 function liffShell(title, desc, hero, body, foot){
   return h("div",{class:"liff"},
-    h("div",{class:"liffbar"}, h("button",{"aria-label":"關閉", onclick:()=>{S.phone.page="chat"; S.sheet=null; render(); scrollFeed();}}, ic("close")), h("span",{class:"t"},"TOYOTA"), h("span")),
+    h("div",{class:"liffbar"}, h("button",{"aria-label":"關閉", onclick:()=>{S.phone.page="chat"; S.sheet=null; render(); scrollFeed();}}, ic("close")), h("span",{class:"t"},"TOYOTA（示意）"), h("span")),
     h("div",{class:"lscroll"}, h("div",{class:"lhero"}, h("div",{class:"tx"}, h("span",{class:"pl"},V.plate), h("h3",null,title), h("p",null,desc)), svgEl(HERO_SVG[hero])), body),
     foot ? h("div",{class:"lfoot"}, foot) : null);
 }
@@ -926,13 +965,14 @@ function liffExplain(){
   const body = h("div",{class:"lform pz","data-tag":"提案① 完整說明"}, tr.items.map(i=>h("div",{class:"lit",style:"gap:3px"}, h("div",{class:"h"}, lv(i.level), h("b",null,i.part)),
     i.reason ? h("span",null,h("b",null,"原因　"),i.reason) : null, i.history ? h("span",null,h("b",null,"紀錄　"),i.history) : null,
     (i.cost||i.time) ? h("span",null,h("b",null,"費用　"),[i.cost,i.time].filter(Boolean).join("｜")) : null, i.notice ? h("span",null,h("b",null,"注意　"),i.notice) : null,
-    i.source ? h("span",{style:"color:#6e7279;font-size:.66rem"},"資料來源：示範知識庫「"+i.source+"」") : null)));
+    i.source ? h("span",{style:"color:#6e7279;font-size:.66rem"},"資料來源："+i.source) : null)));
   return liffShell("維修項目說明","由 AI 維修翻譯官依原廠車主指南與您的保養紀錄整理；費用依工單報價。","car", body,
     S.confirmed ? h("button",{class:"lbtn",disabled:true},"已確認施作") : h("button",{class:"lbtn","data-t":"confirm", onclick:confirmWork},"確認施作"));
 }
 function recDates(){ const ns = nextService(); const out = []; const d = new Date(ns.d); d.setDate(d.getDate()-6);
   while (out.length < 3){ if (d.getDay() !== 0) out.push(new Date(d)); d.setDate(d.getDate()+3); } return out; }
 function openBooking(){
+  if (S.booked) return;
   const l = later(); const recs = recDates();
   S.bk = {date:recs[0], slot:"10:00", wait:"是", contact:"任何時段（08:30–19:30）", notify:"LINE", note: l.length ? `一併處理上次建議項目：${l.map(x=>x.part).join("、")}` : ""};
   S.sheet = null; S.phone = {app:"line", page:"liff-book"}; S.unread.line = 0; render();
@@ -950,14 +990,14 @@ function liffBook(){
       h("button",{class:"rc","aria-pressed":"true"}, h("i",{class:"o"}), h("b",null,"上次回廠服務據點"), h("small",null,`${V.center}｜${V.addr}`)),
       h("button",{class:"rc","aria-pressed":"false", onclick:()=>toast("現行流程（示意）")}, h("i",{class:"o"}), h("b",null,"上次回廠指定保修點／子保修站")),
       h("button",{class:"rc","aria-pressed":"false", onclick:()=>toast("現行流程（示意）")}, h("i",{class:"o"}), h("b",null,"自行選擇服務據點"))),
-    h("div",{class:"lf pz","data-tag":"提案③","data-t":"bk-date"}, h("span",null,"保養日期"), h("button",{class:"datebox", onclick:()=>{S.sheet="cal"; render();}}, b.date ? fmtD(b.date) : "請選擇", ic("cal")),
-      h("span",{class:"aihint"},"✦ AI 依里程預估預先選好日期，日曆中紫點為其他建議日")),
+    h("div",{class:"lf pz","data-tag":"提案③"}, h("span",null,"保養日期"), h("button",{class:"datebox", onclick:()=>{S.sheet="cal"; render();}}, b.date ? fmtD(b.date) : "請選擇", ic("cal")),
+      h("span",{class:"aihint"},"✦ AI 依里程預估預先選好日期")),
     h("div",{class:"lf"}, h("span",null,"保養時段"), h("div",{class:"slots"}, ["09:00","10:00","10:30","14:00","15:30","16:00"].map(s=>h("button",{"aria-pressed":b.slot===s?"true":"false", onclick:()=>{b.slot=s; render();}}, s)))),
     h("div",{class:"lf"}, h("span",null,"是否在廠等候？"), h("div",{class:"radios"}, ["是","否"].map(v=>h("label",null, h("input",{type:"radio",name:"wait",checked:b.wait===v, onchange:()=>{b.wait=v;}}), v)))),
     h("div",{class:"lf"}, h("span",null,"電話聯絡時段"), h("select",{class:"lsel","aria-label":"電話聯絡時段", onchange:e=>{b.contact=e.target.value;}}, ["08:30–12:00","13:00–17:30","18:00–19:30","任何時段（08:30–19:30）","無需電話聯絡"].map(o=>h("option",{selected:b.contact===o},o)))),
     h("div",{class:"lf"}, h("span",null,"入廠提醒通知方式"), h("select",{class:"lsel","aria-label":"入廠提醒通知方式", onchange:e=>{b.notify=e.target.value;}}, ["LINE","My Toyota App","簡訊","電話","無需提醒"].map(o=>h("option",{selected:b.notify===o},o)))),
-    h("div",{class:"lf opt pz","data-tag":"提案③","data-t":"bk-note"}, h("span",null,"其他意見"), ta, b.note ? h("span",{class:"aihint"},"✦ AI 依上次服務摘要預先帶入，可修改") : null));
-  return liffShell("愛車預約保養","提供定期保養預約，若為召修、導航升級、檢修等其他需求，請撥服務據點電話預約。","cal", body,
+    h("div",{class:"lf opt pz","data-tag":"提案③"}, h("span",null,"其他意見"), ta, b.note ? h("span",{class:"aihint"},"✦ AI 依上次服務摘要預先帶入") : null));
+  return liffShell("愛車預約保養","定期保養預約；召修或其他維修需求請洽服務據點。","cal", body,
     h("button",{class:"lbtn","data-t":"bk-submit", disabled:!b.date, onclick:()=>{S.sheet="confirm"; render();}},"確定送出"));
 }
 function sheet(){
@@ -975,17 +1015,18 @@ function sheet(){
   if (S.sheet === "confirm"){
     return h("div",{class:"sheet center"}, h("div",{class:"pn"}, h("h4",null,"確認預約"),
       h("div",{class:"ckv"}, h("span",null,"保養日期"), h("b",null,fmtD(b.date)), h("span",null,"保養時間"), h("b",null,b.slot), h("span",null,"保養據點"), h("b",null,V.center)),
-      h("div",{class:"two"}, h("button",{class:"lbtn o", onclick:()=>{S.sheet=null; render();}},"取消"), h("button",{class:"lbtn", onclick:submitBooking},"確定"))));
+      h("div",{class:"two"}, h("button",{class:"lbtn o", onclick:()=>{S.sheet=null; render();}},"取消"), h("button",{class:"lbtn","data-t":"bk-ok", onclick:submitBooking},"確定"))));
   }
   return null;
 }
 function submitBooking(){
-  const b = S.bk; S.sheet = null;
+  if (S.booked) return;
+  const b = S.bk; if (!b.date) b.date = recDates()[0]; S.sheet = null;
   S.booked = {dateLabel:`${b.date.getMonth()+1}月${b.date.getDate()}日 星期${WK[b.date.getDay()]}`, slot:b.slot, wait:b.wait, note:b.note, text:`${fmtD(b.date)} ${b.slot}｜${V.center}`};
   S.phone.page = "liff-ok"; render();
-  setTimeout(()=>{ pushLine({t:"booked"}); S.phone = {app:"line", page:"chat"}; S.unread.line = 0; render(); scrollFeed(); }, 3000);
+  setTimeout(()=>{ pushLine({t:"booked"}); S.phone = {app:"line", page:"chat"}; S.unread.line = 0; render(); scrollFeed(); }, 2000);
 }
-function liffOk(){ return h("div",{class:"okview"}, h("div",{class:"c"}, ic("check")), h("b",{style:"font-size:1.02rem"},"預約成功"), h("p",{style:"color:#6e7279;font-size:.8rem"},"3 秒後將回到 LINE")); }
+function liffOk(){ return h("div",{class:"okview"}, h("div",{class:"c"}, ic("check")), h("b",{style:"font-size:1.02rem"},"預約成功"), h("p",{style:"color:#6e7279;font-size:.8rem"},"即將回到 LINE")); }
 
 /* ---- My TOYOTA App ---- */
 function appScreen(){ const pg = S.phone.page; if (pg === "progress") return appProgress(); if (pg === "records") return appRecords(); if (pg === "detail") return appDetail(); return appHome(); }
@@ -995,20 +1036,20 @@ function todayStatus(){ const st = progSteps(); const idx = Math.min(S.prog, st.
 function appHome(){
   const ts = todayStatus(); const inShop = S.confirmed && S.care === 0;
   return h("div",{class:"app"},
-    h("div",{class:"ahead"}, h("span",{class:"pts"}, h("span",{class:"p"},"P"), "238"), h("span",{class:"t"},"TOYOTA"), h("span",{class:"q"}, ic("qr"))),
+    h("div",{class:"ahead"}, h("span",{class:"pts"}, h("span",{class:"p"},"P"), "238"), h("span",{class:"t"},"TOYOTA（示意）"), h("span",{class:"q"}, ic("qr"))),
     h("div",{class:"ascroll",id:"feed"},
       h("div",{class:"acar"}, h("small",null,V.model), h("div",{class:"row"}, h("b",null, V.plate, " ˅"), h("span",{class:"mg"}, ic("gear"), "管理愛車"))),
-      inShop ? h("button",{class:"today pz","data-tag":"提案②","data-t":"today-entry", onclick:()=>{ APP("progress","progress"); render(); }}, h("b",null, ts.idx>=ts.st.length ? "今日回廠｜已完工，請至交車區" : `今日回廠｜${ts.st[ts.idx].label}中`),
-        h("small",null, S.extraPushed && !S.extraDecision ? "技師有新發現，請確認中間報告" : ts.idx>=ts.st.length ? "感謝您的耐心等候" : `預計 ${ts.eta} 完成｜進度、車況圖解、用車知識`), h("span",{class:"go"},"查看 ›")) : null,
+      inShop ? h("button",{class:"today pz","data-tag":"提案②", onclick:()=>{ APP("progress","progress"); render(); }}, h("b",null, ts.idx>=ts.st.length ? "今日回廠｜已完工，請至交車區" : `今日回廠｜${ts.st[ts.idx].label}中`),
+        h("small",null, ts.idx>=ts.st.length ? "感謝您的耐心等候" : `預計 ${ts.eta} 完成｜進度、車況圖解、用車知識`), h("span",{class:"go"},"查看 ›")) : null,
       S.care ? h("button",{class:"today pz","data-tag":"提案③", onclick:()=>{ APP("detail"); render(); }}, h("b",null,"今日服務摘要已上傳"), h("small",null,"白話說明今天做了什麼、接下來要注意什麼"), h("span",{class:"go"},"查看 ›")) : null,
       h("div",{class:"tiles"},
         h("button",{class:"tile t1", onclick:()=>{ APP("records"); render(); }}, ic("car"), "愛車秘書"),
-        h("button",{class:"tile t2", onclick:()=>{ if (S.care>=1) openBooking(); else toast("現行預約流程（示意）"); }}, ic("wrench"), "預約保養"),
+        h("button",{class:"tile t2", onclick:()=>toast("現行預約流程（示意）")}, ic("wrench"), "預約保養"),
         h("button",{class:"tile t3", onclick:()=>toast("現行功能（示意）")}, ic("tag"), "愛車優惠")),
       h("div",{class:"igrid"}, [["news","車主新訊"],["book","車主指南"],["pin","營業據點"],["list","保修紀錄",1],["park","停車與代扣"],["drop","洗車地圖"],["plug","充電站"],["head","智能客服"]].map(([i,l,go])=>
         h("button",{onclick:()=>{ if (go){ APP("records"); render(); } else toast("現行功能（示意）"); }}, ic(i), l))),
-      h("div",{class:"promo"}, h("b",null,"回廠保養可用和泰 Points 折抵"), h("span",null,"1 點折抵 1 元（示意）"))),
-    h("div",{class:"anav"}, [["home","首頁",1],["card","和泰Pay"],["pts","和泰Points"],["bell","個人通知"],["more","更多"]].map(([i,l,on])=>h("div",{class:on?"on":""}, ic(i), l))));
+      h("div",{class:"promo"}, h("b",null,"回廠保養可用點數折抵"), h("span",null,"（示意）"))),
+    h("div",{class:"anav"}, [["home","首頁",1],["card","支付"],["pts","點數"],["bell","個人通知"],["more","更多"]].map(([i,l,on])=>h("div",{class:on?"on":""}, ic(i), l))));
 }
 function appProgress(){
   const ts = todayStatus();
@@ -1016,8 +1057,8 @@ function appProgress(){
   const body = h("div",{class:"ascroll",style:"padding-top:10px",id:"feed"});
   if (S.extraPushed && !S.extraDecision){
     const x = S.extra || FB_EXTRA;
-    body.append(h("div",{class:"acard pz","data-tag":"提案①","data-t":"extra-card"}, h("h4",null,"中間報告｜技師有新發現"), litem(x), x.notice ? h("p",{class:"tx"},"注意："+x.notice) : null,
-      h("div",{class:"two"}, h("button",{class:"lbtn o", onclick:()=>decideExtra("no")},"暫不處理"), h("button",{class:"lbtn", onclick:()=>decideExtra("yes")},"同意加做"))));
+    body.append(h("div",{class:"acard pz","data-tag":"提案①"}, h("h4",null,"中間報告｜技師有新發現"), litem(x), x.notice ? h("p",{class:"tx"},"注意："+x.notice) : null,
+      h("div",{class:"two"}, h("button",{class:"lbtn o", onclick:()=>decideExtra("no")},"暫不處理"), h("button",{class:"lbtn","data-t":"extra-yes", onclick:()=>decideExtra("yes")},"同意加做"))));
   }
   if (S.appTab === "progress"){
     let acc = 0; const start = 9*60+50;
@@ -1030,18 +1071,18 @@ function appProgress(){
         return h("li",{class:k<ts.idx?"done":k===ts.idx?"now":"todo"}, h("time",null,tm), h("span",{class:"d"}), h("span",null,x.label), h("span")); }))));
   } else if (S.appTab === "car"){
     const map = zoneItems(); const sel = S.zone && map[S.zone];
-    body.append(h("div",{class:"acard pz","data-tag":"提案②","data-t":"carsvg"}, h("h4",null,"車況圖解｜點選彩色部位"), h("div",{class:"carwrap"}, carSVG()), h("div",{class:"legend2"}, ["urgent","routine","soon","ok"].map(lv))));
+    body.append(h("div",{class:"acard pz","data-tag":"提案②"}, h("h4",null,"車況圖解｜點選彩色部位"), h("div",{class:"carwrap"}, carSVG()), h("div",{class:"legend2"}, ["urgent","routine","soon","ok"].map(lv))));
     if (S.zone) body.append(h("div",{class:"acard pz","data-t":"zone-detail"}, h("h4",null,ZONES[S.zone].label), sel && sel.length ? sel.map(litem) : h("p",{class:"tx"},"這個部位本次沒有檢查項目。")));
   } else {
     body.append(h("div",{class:"acard pz","data-tag":"提案②"}, h("h4",null,"為您挑選的 3 分鐘用車知識"), h("p",{class:"tx"},"依您的車型、里程、今天的檢查結果與用車情境（通勤為主、下個月環島）產生。"),
       S.knowledge ? null : h("button",{class:"lbtn ai","data-t":"know-btn", disabled:!!S.busy.knowledge, onclick:doKnowledge}, S.busy.knowledge ? "產生中…" : "✦ 產生我的知識卡"),
-      S.busy.knowledge ? h("p",{class:"tx thinking"},"AI 正在挑選適合您的內容") : null, S.err.knowledge ? h("p",{class:"tx"},S.err.knowledge) : null));
+      S.busy.knowledge ? h("p",{class:"tx thinking"},"AI 正在挑選適合您的內容") : null));
     if (S.knowledge) body.append(h("div",{style:"display:grid;gap:9px","data-t":"know-list"}, S.knowledge.map(c=>h("div",{class:"kc pz lite"}, h("b",null,c.title), h("p",null,c.body), c.why ? h("small",null,"✦ 推薦原因："+c.why) : null))));
   }
   return h("div",{class:"app"}, appSub("今日回廠進度","home"), tabs, body);
 }
 function appRecords(){
-  const body = h("div",{class:"ascroll",id:"feed"}, h("div",{class:"warnbar"}, ic("warn"), "因資料量龐大，僅提供 2 年內的回廠紀錄"));
+  const body = h("div",{class:"ascroll",id:"feed"}, h("div",{class:"warnbar"}, ic("warn"), "僅顯示近期回廠紀錄（示意）"));
   if (S.care){
     const a = approved(); const amt = a.reduce((s,x)=>s+priceOf(x.part),0);
     body.append(h("div",{class:"rec pz","data-tag":"提案③"}, h("div",{class:"top2"}, h("span",null,"2026/10/10", h("span",{class:"new"},"NEW"))),
@@ -1095,8 +1136,10 @@ function carSVG(){
   for (const [k,z] of Object.entries(ZONES)){
     const its = map[k]; const l = its.length ? its.reduce((a,b)=>RANK[b.level]>RANK[a]?b.level:a, its[0].level) : null;
     const g = s("g",{class:"hot", tabindex:"0", role:"button", "aria-label": z.label + (l ? "：" + LV[l] : "：本次未檢查")});
-    for (const [cx,cy] of z.pts){ if (S.zone===k) g.append(s("circle",{cx,cy,r:15,fill:"none",stroke:"#1e1f22","stroke-width":2}));
-      g.append(s("circle",{cx,cy,r:11,fill:l?COLOR[l]:"#c4c8cf",stroke:"#fff","stroke-width":2})); }
+    z.pts.forEach(([cx,cy], n)=>{ if (S.zone===k) g.append(s("circle",{cx,cy,r:15,fill:"none",stroke:"#1e1f22","stroke-width":2}));
+      const c = s("circle",{cx,cy,r:11,fill:l?COLOR[l]:"#c4c8cf",stroke:"#fff","stroke-width":2});
+      if (k==="front" && n===0) c.setAttribute("data-t","carsvg");  // 引導點擊的目標：左前輪
+      g.append(c); });
     const pick = ()=>{S.zone = k; render();};
     g.addEventListener("click", pick); g.addEventListener("keydown", e=>{ if (e.key==="Enter"||e.key===" "){ e.preventDefault(); pick(); }});
     svg.append(g);
@@ -1104,66 +1147,123 @@ function carSVG(){
   return svg;
 }
 
-/* ================= 場景列與渲染 ================= */
-function caption(){
+/* ================= 導覽列、說明卡、開場／結尾 ================= */
+function chapters(){
+  const groups = [[0,"開始",1],[1,"① 翻譯官",1],[2,"② 客休體驗",4],[3,"③ 售後關懷",7]];
+  const curF = SCENES[S.scene].f || 0;
+  return groups.map(([f,l,idx])=>h("button",{"aria-current": (f===curF && !(f===0 && S.scene===LAST)) ? "true" : "false", onclick:()=>{ if (f===0) goScene(0); else goScene(idx); }}, l));
+}
+function guide(){
   const sc = SCENES[S.scene];
-  const badge = sc.f ? h("span",{class:"fb"}, ["","①","②","③"][sc.f]) : h("span",{class:"fb neutral"}, sc.key==="intro" ? "導覽" : "總結");
-  const l = h("div",{class:"l"}, badge, h("div",{style:"min-width:0"}, h("h2",null, sc.title),
-    h("div",{class:"meta"}, h("span",{class:"chip slide"},"對應簡報 "+sc.slide), sc.f ? h("span",{class:"chip p"},"提案"+["","①","②","③"][sc.f]+" "+FEAT[sc.f]) : null)));
-  const m = h("div",{class:"m"}, sc.lines ? sc.lines.map(([a,b])=>h("p",{class:"new"}, h("b",null,a), h("span",null,b)))
-    : [h("p",{class:"now"}, h("b",null,"現行"), h("span",null,sc.now)), h("p",{class:"new"}, h("b",null,"提案"), h("span",null,sc.next))]);
-  const r = h("div",{class:"r"}, h("p",{class:"hint"}, h("b",null, sc.run ? "操作" : "說明"), h("span",null,sc.hint)),
-    sc.run ? h("button",{class:"runb", onclick:()=>sc.run()},"▶ 自動執行這一步") : null);
-  return [l, m, r];
+  if (sc.overlay) return [h("div",{class:"g-title"}, h("span",{class:"fb"},"▶"), h("div",null, h("h2",null, sc.overlay==="welcome" ? "歡迎來到透明時刻 Demo" : "體驗完成"), h("small",null,"請看畫面中央的說明")))];
+  const st = curStep(); const done = !st;
+  const title = h("div",{class:"g-title"}, h("span",{class:"fb"}, NUM[sc.f]), h("div",{style:"min-width:0"}, h("h2",null, sc.title), h("small",null, `提案${NUM[sc.f]} ${FEAT[sc.f]}｜對應簡報 ${sc.slide}`)));
+  // 同一段「請操作」同時放在說明卡（寬螢幕）與底部操作列（窄螢幕），由 CSS 決定顯示哪一個
+  const todo = () => done ? h("p",{class:"gtodo done"}, h("span",{class:"k"},"完成"), h("span",null, "✓ " + sc.resultSay + (S.scene===LAST-1 ? "。按「看總結」" : "。按「下一步」繼續")))
+    : h("p",{class:"gtodo"}, h("span",{class:"k"}, st.n>1 ? `請操作 ${st.i+1}/${st.n}` : "請操作"), h("span",null, S.recording ? "語音辨識中，請稍候…" : st.s.say));
+  const mid = h("div",{class:"g-mid"}, h("div",{class:"vs"}, h("b",{class:"o"},"現行"), h("span",null, sc.now), h("b",{class:"n"},"提案"), h("span",null, sc.next)), todo());
+  const acts = h("div",{class:"acts",id:"acts"}, todo(), h("div",{class:"abtns"},
+    h("button",{class:"btn", onclick:()=>goScene(S.scene-1)},"← 上一步"),
+    done ? null : h("button",{class:"btn help", onclick:helpMe},"幫我點一下"),
+    h("button",{class:"btn next"+(done?" ready":""), onclick:()=>goScene(S.scene+1)}, S.scene===LAST-1 ? "看總結 →" : "下一步 →")));
+  return [title, mid, acts];
 }
-function segs(){
-  const out = []; let lastF = -1;
-  SCENES.forEach((sc,i)=>{ const g = sc.f || (i===0 ? "intro" : "end");
-    if (g !== lastF){ out.push(h("span",{class:"gl"}, sc.f ? ["","①","②","③"][sc.f] : (i===0?"導覽":"總結"))); lastF = g; }
-    out.push(h("button",{class:i<S.scene?"done":null,"aria-current":i===S.scene?"true":"false","aria-label":`第 ${i+1} 幕：${sc.title}`, title:`${i+1}. ${sc.title}（簡報 ${sc.slide}）`, onclick:()=>goScene(i)})); });
-  return out;
+function modal(){
+  const sc = SCENES[S.scene]; if (!sc.overlay) return [];
+  if (sc.overlay === "welcome"){
+    return [h("div",{class:"modal",role:"dialog","aria-modal":"true","aria-labelledby":"wt"}, h("div",{class:"mcard"},
+      h("span",{class:"eyebrow"},"2026 和泰 AI 黑客松｜提案互動 Demo"),
+      h("h1",{id:"wt"},"透明時刻 Clear Moment"),
+      h("p",{class:"lead"},"示範我們的 AI 功能如何嵌進服務廠的平板工單，以及車主手機上的官方 LINE 與 My TOYOTA App。不用安裝、不用帳號，約 3 分鐘。"),
+      h("div",{class:"fcards"}, [[1,"AI 維修翻譯官","把專業術語翻成車主聽得懂的話，看不懂可以直接問",1],[2,"智慧客休體驗","等待時看得到進度、車況圖解與個人化用車知識",4],[3,"個人化售後關懷","交車後自動整理摘要、關懷提醒，一鍵預約下次保養",7]].map(([n,t,d,idx])=>
+        h("button",{class:"fcard", onclick:()=>goScene(idx)}, h("span",{class:"n"}, NUM[n]), h("b",null,t), h("span",null,d), h("small",null,"直接看這個功能 →")))),
+      h("div",{class:"how"}, h("span",null, h("b",null,"怎麼看："), "跟著畫面上紫色的「點這裡」操作，或按「幫我點一下」；做完按「下一步」。"),
+        h("span",null, h("b",null,"畫面說明："), "紫框＋「提案」標籤是我們新增的 AI 功能；淡灰色是和泰現有系統（示意）。")),
+      h("div",{class:"mrow"}, h("button",{class:"btn next big", id:"startBtn", onclick:()=>goScene(1)},"開始體驗 ▶")),
+      h("p",{class:"fine"},"非官方示意；車輛、報價與服務據點皆為虛構；AI 內容為預先寫好的示範文字。")))];
+  }
+  return [h("div",{class:"modal",role:"dialog","aria-modal":"true","aria-labelledby":"et"}, h("div",{class:"mcard"},
+    h("span",{class:"eyebrow"},"體驗完成"),
+    h("h1",{id:"et"},"三個功能，嵌進三個現有系統"),
+    h("div",{class:"fcards"}, [[1,"AI 維修翻譯官","平板工單＋官方 LINE：說明聽得懂、問得到，複雜問題轉專員",1],[2,"智慧客休體驗","My TOYOTA App：等待時看懂自己的車",4],[3,"個人化售後關懷","App 保修紀錄＋官方 LINE：離廠後服務不斷線",7]].map(([n,t,d,idx])=>
+      h("button",{class:"fcard", onclick:()=>goScene(idx)}, h("span",{class:"n"}, NUM[n]), h("b",null,t), h("span",null,d), h("small",null,"再看一次 →")))),
+    h("p",{class:"lead"},"車主不用多裝 App、專員不用學新系統，落地門檻低。"),
+    h("div",{class:"mrow"}, h("button",{class:"btn next big", onclick:restart},"重新開始"), h("button",{class:"btn", onclick:()=>goScene(LAST-1)},"← 回到上一步"))))];
 }
-function appSwitch(){
-  return [["line","官方 LINE"],["app","My TOYOTA App"]].map(([k,l])=>h("button",{"aria-pressed":S.phone.app===k?"true":"false", onclick:()=>{
-    if (k==="line"){ LINE_CHAT(); } else { APP(S.confirmed && !S.care ? "progress" : "home"); }
-    S.sheet = null; render(); scrollFeed(); }}, l, S.unread[k] ? h("span",{class:"badge"}) : null));
+function devTabs(){
+  return [["staff","服務專員的平板"],["owner","車主的手機"]].map(([k,l])=>h("button",{"data-dev":k,"aria-pressed":S.view===k?"true":"false", onclick:()=>{ S.view=k; render(); }}, l,
+    (k==="owner" && S.view!=="owner" && (S.unread.line||S.unread.app)) ? h("span",{class:"badge"}) : null));
+}
+const narrow = window.matchMedia("(max-width: 899px)");
+function placePointer(){
+  const pt = document.getElementById("pointer");
+  const el = document.querySelector(".pulse");
+  if (!el || SCENES[S.scene].overlay){ pt.hidden = true; return; }
+  const r = el.getBoundingClientRect();
+  const limit = innerHeight - (narrow.matches ? ((document.getElementById("acts")||{}).offsetHeight || 0) : 0);
+  if (r.width === 0 || r.bottom < 0 || r.top > limit - 10){ pt.hidden = true; return; }
+  const info = targetInfo();
+  pt.textContent = info.look ? "結果在這裡" : "點這裡";
+  pt.className = "pointer" + (info.look ? " look" : "") + (r.top < 70 ? " below" : "");
+  const x = Math.max(60, Math.min(innerWidth - 60, r.left + Math.min(r.width/2, 120)));
+  pt.style.left = x + "px"; pt.style.top = (r.top < 70 ? r.bottom : r.top) + "px";
+  pt.hidden = false;
 }
 function render(){
+  if (S.phone.app==="app" && S.phone.page==="detail" && S.care) S.viewedRecord = true;
   const feed = document.getElementById("feed"); const keep = feed ? feed.scrollTop : null;
   const tm = document.getElementById("tmain"); const keepT = tm ? tm.scrollTop : null;
   const active = document.activeElement && document.activeElement.id;
-  document.getElementById("cap").replaceChildren(...caption());
-  document.getElementById("segs").replaceChildren(...segs());
-  document.getElementById("count").textContent = `${S.scene+1} / ${SCENES.length}`;
-  document.getElementById("prev").disabled = S.scene === 0;
-  document.getElementById("next").disabled = S.scene === SCENES.length-1;
-  document.getElementById("jump").value = String(S.scene);
-  document.getElementById("appsw").replaceChildren(...appSwitch());
+  const real = SCENES[S.scene].overlay ? (S.scene===0 ? 0 : REAL) : S.scene;
+  document.getElementById("count").textContent = SCENES[S.scene].overlay ? (S.scene===0 ? "開始" : "完成") : `步驟 ${real} / ${REAL}`;
+  document.getElementById("barI").style.width = Math.round(real / REAL * 100) + "%";
+  document.getElementById("chap").replaceChildren(...chapters());
+  document.getElementById("guide").replaceChildren(...guide());
+  document.getElementById("appname").textContent = S.phone.app === "line" ? "官方 LINE（示意）" : "My TOYOTA App（示意）";
   document.getElementById("tablet").replaceChildren(...tablet());
   document.getElementById("phone").replaceChildren(...phone());
+  document.getElementById("modal").replaceChildren(...modal());
   const f2 = document.getElementById("feed"); if (f2 && keep != null) f2.scrollTop = keep;
   const t2 = document.getElementById("tmain"); if (t2 && keepT != null) t2.scrollTop = keepT;
   if (active === "lineInput") document.getElementById("lineInput")?.focus();
-  const tg = sceneTargets(); document.querySelectorAll("[data-t]").forEach(el=>el.classList.toggle("pulse", tg.includes(el.dataset.t)));
-  const key = S.scene + ":" + tg.join(",");
-  if (key !== lastPulse){ lastPulse = key; requestAnimationFrame(()=>{ const el = document.querySelector(".pulse"); if (el) el.scrollIntoView({block:"nearest", inline:"nearest"}); }); }
+  const info = targetInfo();
+  document.querySelectorAll("[data-t]").forEach(el=>{ const on = !!info.t && el.dataset.t === info.t; el.classList.toggle("pulse", on); el.classList.toggle("look", on && info.look); });
+  const key = S.scene + ":" + info.t + ":" + S.phone.page + ":" + S.tab;
+  const el = document.querySelector(".pulse");
+  if (el && narrow.matches){ const dev = el.closest(".col-staff") ? "staff" : "owner"; if (key !== lastTarget && dev !== S.view){ S.view = dev; } }
+  document.getElementById("stage").dataset.view = S.view;
+  document.getElementById("devtabs").replaceChildren(...devTabs());
+  let lost = "";
+  if (info.t && !info.look && !el && SHOW[info.t] && !Object.values(S.busy).some(Boolean) && !S.recording) lost = "（目前畫面看不到，按「幫我點一下」帶你過去）";
+  const tdev = el ? (el.closest(".col-staff") ? "staff" : "owner") : null;
+  if (narrow.matches && tdev && tdev !== S.view){
+    const b = document.querySelector(`#devtabs [data-dev="${tdev}"]`); if (b) b.classList.add("tgt");
+    if (!info.look) lost = `（在「${tdev==="owner"?"車主的手機":"服務專員的平板"}」畫面，點上方切換）`;
+  }
+  if (lost) document.querySelectorAll(".gtodo:not(.done)").forEach(p=>p.lastElementChild.append(h("span",{class:"lost"}, lost)));
+  const acts = document.getElementById("acts");
+  if (acts && narrow.matches) document.documentElement.style.setProperty("--barH", acts.offsetHeight + "px");
+  if (key !== lastTarget){ lastTarget = key; requestAnimationFrame(()=>{ const e = document.querySelector(".pulse"); if (e) reveal(e); requestAnimationFrame(placePointer); }); }
+  else requestAnimationFrame(placePointer);
 }
-function scrollFeed(){ requestAnimationFrame(()=>{ const f = document.getElementById("feed"); if (f && S.phone.app==="line" && S.phone.page==="chat"){ const p = f.querySelector(".pulse"); if (p) p.scrollIntoView({block:"nearest"}); else f.scrollTop = f.scrollHeight; } }); }
+// 把要操作／要看的地方捲到畫面中：寬螢幕只捲裝置內部；窄螢幕置中，且避開底部操作列
+function reveal(e){
+  if (!narrow.matches){ e.scrollIntoView({block:"nearest", inline:"nearest"}); return; }
+  const barH = (document.getElementById("acts")||{}).offsetHeight || 0;
+  const tall = e.getBoundingClientRect().height > (innerHeight - barH) * 0.55;
+  e.scrollIntoView({block: tall ? "start" : "center", inline:"nearest"});
+}
+function scrollFeed(){ requestAnimationFrame(()=>{ const f = document.getElementById("feed"); if (f && S.phone.app==="line" && S.phone.page==="chat"){ const p = f.querySelector(".pulse"); if (p) reveal(p); else f.scrollTop = f.scrollHeight; } requestAnimationFrame(placePointer); }); }
 
 /* ================= 事件 ================= */
-const jump = document.getElementById("jump");
-SCENES.forEach((sc,i)=>jump.append(h("option",{value:String(i)}, `${i+1}. ${sc.f?["","①","②","③"][sc.f]+" ":""}${sc.title}（${sc.slide}）`)));
-jump.addEventListener("change", e=>goScene(+e.target.value));
-document.getElementById("prev").addEventListener("click", ()=>goScene(S.scene-1));
-document.getElementById("next").addEventListener("click", ()=>goScene(S.scene+1));
-document.getElementById("focusT").addEventListener("change", e=>{ document.getElementById("shell").classList.toggle("focus", e.target.checked); });
-document.getElementById("shell").classList.add("focus");
 document.addEventListener("keydown", e=>{
   const tag = (e.target && e.target.tagName) || ""; if (/INPUT|TEXTAREA|SELECT/.test(tag)) return;
   if (["ArrowRight","PageDown"].includes(e.key)){ e.preventDefault(); goScene(S.scene+1); }
   if (["ArrowLeft","PageUp"].includes(e.key)){ e.preventDefault(); goScene(S.scene-1); }
 });
-function fromHash(){ const k = (location.hash||"").slice(1); const i = SCENES.findIndex(s=>s.key===k); return i; }
+window.addEventListener("resize", ()=>{ lastTarget = ""; render(); });
+document.addEventListener("scroll", ()=>requestAnimationFrame(placePointer), true);
+function fromHash(){ const k = (location.hash||"").slice(1); return SCENES.findIndex(s=>s.key===k); }
 window.addEventListener("hashchange", ()=>{ const i = fromHash(); if (i >= 0 && i !== S.scene) goScene(i); });
 goScene(Math.max(0, fromHash()));
 </script>
